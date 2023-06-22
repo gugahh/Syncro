@@ -10,7 +10,7 @@ public class SynchroHelp {
 
 	static {
 
-		//Definido Help Básico.
+		//Definido Help BÃ¡sico.
 		basicHelp.append("-----------------------------------------------------------\n");
 		basicHelp.append("|  Syncro - um aplicativo para sincronizacao de Legendas  |\n");
 		basicHelp.append("|      (c) 2007, Gustavo Santos (gugahh@ig.com.br)        |\n");
@@ -33,7 +33,7 @@ public class SynchroHelp {
 		basicHelp.append("\n");
 		basicHelp.append("  [-nobak]: Opcional. Usar quando nao desejar criar um arquivo de backup.\n");
 
-		//Definindo Help Avançado
+		//Definindo Help AvanÃ§ado
 		/*
 		for(StringBuilder b: extendedHelp) {
 			b = new StringBuilder(""); //Inicializando os stringBuilders
@@ -82,8 +82,8 @@ public class SynchroHelp {
 		extendedHelp[1].append("                                 (o sinal positivo e opcional);\n");
 		extendedHelp[1].append("                   -15:10,012  - para adiantar 15 minutos, 10 segundos e\n");
 		extendedHelp[1].append("                                 12 milesimos.\n");
-		extendedHelp[1].append("                   -1,103      - para adiantar 1 segundo e 103 milésimos.\n");
-		extendedHelp[1].append("                    0,003      - para adiantar 3 milésimos de segundo.\n");
+		extendedHelp[1].append("                   -1,103      - para adiantar 1 segundo e 103 milÃ©simos.\n");
+		extendedHelp[1].append("                    0,003      - para adiantar 3 milÃ©simos de segundo.\n");
 		extendedHelp[1].append("\n");
 		extendedHelp[1].append("       [indiceLegenda]: (opcional) Legenda desde a qual se deseja alterar.\n");
 		extendedHelp[1].append("                        Todas as legendas seguintes sofrerao a mesma alteracao\n");
@@ -127,7 +127,7 @@ public class SynchroHelp {
 		extendedHelp[3].append("	------------------------------------------\n");
 		extendedHelp[3].append("	\n");
 		extendedHelp[3].append("	Cartoes postais de qualquer lugar serao bem vindos e colecionados!\n");
-		extendedHelp[3].append("	Não esqueca de adicionar o seu e-mail no cartao postal para que \n");
+		extendedHelp[3].append("	NÃ£o esqueca de adicionar o seu e-mail no cartao postal para que \n");
 		extendedHelp[3].append("	eu possa agradecer.\n");
 	}
 
@@ -141,7 +141,7 @@ public class SynchroHelp {
 
 		while(telaDeHelp < extendedHelp.length){
 			System.out.print(extendedHelp[telaDeHelp]);
-			inp.read(); //Aguarda input do usuário
+			inp.read(); //Aguarda input do usuÃ¡rio
 			telaDeHelp++;
 		}
 	}

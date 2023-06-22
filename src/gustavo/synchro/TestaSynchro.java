@@ -22,22 +22,22 @@ public class TestaSynchro {
 		RENUM(
 				"-renum",
 				"monk.srt",
-				"634",		//arg2: Posic inicial para renumerar (vai daqui atÈ o fim).
-				"1",		//arg3: Posic desejada apÛs renumerar
+				"634",		//arg2: Posic inicial para renumerar (vai daqui at√© o fim).
+				"1",		//arg3: Posic desejada ap√≥s renumerar
 				null		//Arg4
 		),
 		RENUM_INVALID_ARGUMENT_1(
 				"-renum",
 				"monk.srt",
-				"jota",		//arg2: Posic inicial para renumerar (vai daqui atÈ o fim): Deve acusar erro.
-				"10",		//arg3: Posic desejada apÛs renumerar
+				"jota",		//arg2: Posic inicial para renumerar (vai daqui at√© o fim): Deve acusar erro.
+				"10",		//arg3: Posic desejada ap√≥s renumerar
 				null		//Arg4
 		),
 		RENUM_INVALID_ARGUMENT_2(
 				"-renum",
 				"monk.srt",
-				"10",		//arg2: Posic inicial para renumerar (vai daqui atÈ o fim): Deve acusar erro.
-				"-1",		//arg3: Posic desejada apÛs renumerar
+				"10",		//arg2: Posic inicial para renumerar (vai daqui at√© o fim): Deve acusar erro.
+				"-1",		//arg3: Posic desejada ap√≥s renumerar
 				null		//Arg4
 		);
 
@@ -63,7 +63,7 @@ public class TestaSynchro {
 		//Indique aqui o teste que deseja executar
 		final TipoTeste test = TipoTeste.ADJUST_TIME_NO_INDEX;
 
-		// Passando apenas os par‚metros que se aplicam.
+		// Passando apenas os par√¢metros que se aplicam.
 		if(test.arg3==null){
 			SynchroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2 } );
 		}

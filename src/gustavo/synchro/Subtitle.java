@@ -90,7 +90,7 @@ public class Subtitle {
 		this.texto.append(texto);
 	}
 
-	//transforma uma String contendo um período no formato 00:00:01,520 para um int.
+	//transforma uma String contendo um perÃ­odo no formato 00:00:01,520 para um int.
 	public static int convertSubtitleTimeStampStringToInt(String subtitleMillisString){
 		int horas		= Integer.parseInt(subtitleMillisString.substring(0, 2));
 		int minutos		= Integer.parseInt(subtitleMillisString.substring(3, 5));
@@ -106,7 +106,7 @@ public class Subtitle {
 		return ((horas*1000*3600)+(minutos*1000*60)+(segundos*1000)+milis);
 	}
 
-	//faz o inverso: transforma um inteiro em uma String contendo um período no formato 00:00:01,520
+	//faz o inverso: transforma um inteiro em uma String contendo um perÃ­odo no formato 00:00:01,520
 	public static String convertIntToSubtitleTimeStamp(int timeStampAsInt){
 		int horas		= (int)  timeStampAsInt / (1000*3600);
 		int minutos		= (int) (timeStampAsInt % (1000*3600)) / 60000;
