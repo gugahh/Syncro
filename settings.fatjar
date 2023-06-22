@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Sun Jul 08 22:01:57 GMT-03:00 2007
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=syncro.jar
+manifest.mergeall=true
+manifest.mainclass=gustavo.synchro.SynchroApp
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=<po|Synchro>~gustavo/~synchro/~TestaSynchro$TipoTeste.class;<po|Synchro>~gustavo/~synchro/~TestaSynchro.class
+includes=
