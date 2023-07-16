@@ -25,3 +25,12 @@ replay_pid*
 
 #build do aplicativo
 syncro.jar
+
+#legendas de Exemplo
+*.srt
+
+#pasta de build
+target/
+
+#Outros
+*.old
