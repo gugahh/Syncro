@@ -1,4 +1,4 @@
-package gustavo.synchro;
+package gustavo.syncro;
 
 import java.io.File;
 import java.io.FileReader;
@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class SynchroApp {
+public class SyncroApp {
 
 	ArrayList<Subtitle> objetosLegenda;
 	ArrayList<String> arquivoOriginal;
@@ -22,7 +22,7 @@ public class SynchroApp {
 		howToGetHelpStr = "Digite java -jar syncro.jar -help para obter ajuda.";
 	}
 
-	public SynchroApp(){
+	public SyncroApp(){
 		objetosLegenda = new ArrayList<Subtitle>();
 		arquivoOriginal = new ArrayList<String>();
 		posIndicesLegendas = new ArrayList<Integer>();
@@ -389,7 +389,7 @@ public class SynchroApp {
 
 		if(args.length==0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
-			SynchroHelp.printBasicHelp();
+			SyncroHelp.printBasicHelp();
 			System.exit(0);
 		}
 
@@ -400,7 +400,7 @@ public class SynchroApp {
 						args[0].equalsIgnoreCase("/h"))
 		   ){
 			//Usu solicitou um help estendido.
-			SynchroHelp.printExtendedHelp();
+			SyncroHelp.printExtendedHelp();
 			System.exit(0);
 		}
 
@@ -429,7 +429,7 @@ public class SynchroApp {
 				 * No caso de qualquer método falhar a operação
 				 * (execução da App) deve ser abortada. */
 
-				SynchroApp s = new SynchroApp();
+				SyncroApp s = new SyncroApp();
 
 				// args[0] args[1]   args[2]  args[3](opc)     args[3 ou 4] (opc)
 				//[-adjust [arquivo] [tempo] [indiceLegenda] ] [-nobak]
@@ -492,7 +492,7 @@ public class SynchroApp {
 					 * No caso de qualquer método falhar a operação
 					 * (execução da App) deve ser abortada. */
 
-					SynchroApp s = new SynchroApp();
+					SyncroApp s = new SyncroApp();
 
 					// args[0] args[1]   args[2]         args[3]           args[4] (opc)
 					//[-renum [arquivo] [indiceInicial] [renumerarPara] ] [-nobak]

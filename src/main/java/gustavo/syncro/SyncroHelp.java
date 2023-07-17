@@ -1,9 +1,9 @@
-package gustavo.synchro;
+package gustavo.syncro;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class SynchroHelp {
+public class SyncroHelp {
 
 	private static final StringBuilder basicHelp = new StringBuilder("");
 	private static StringBuilder[] extendedHelp = new StringBuilder[4];
@@ -13,7 +13,7 @@ public class SynchroHelp {
 		//Definido Help Básico.
 		basicHelp.append("-----------------------------------------------------------\n");
 		basicHelp.append("|  Syncro - um aplicativo para sincronizacao de Legendas  |\n");
-		basicHelp.append("|      (c) 2007, Gustavo Santos (gugahh@ig.com.br)        |\n");
+		basicHelp.append("|      (c) 2007, Gustavo Santos (gugahh.br@gmail.com)     |\n");
 		basicHelp.append("-----------------------------------------------------------\n");
 		basicHelp.append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
 		basicHelp.append("  arquivo de legendas *.srt.\n");

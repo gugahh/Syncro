@@ -1,4 +1,4 @@
-Backlog do Projeto Synchro
+Backlog do Projeto Syncro
 =============================
 
 1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado.

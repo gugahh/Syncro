@@ -1,4 +1,4 @@
-package gustavo.synchro;
+package gustavo.syncro;
 
 public class Subtitle {
 
