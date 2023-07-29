@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Syncro" />
+        <module name="syncro" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Syncro" target="1.8" />
+      <module name="syncro" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

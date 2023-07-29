@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 public class SyncroHelp {
 
 	private static final StringBuilder basicHelp = new StringBuilder("");
-	private static StringBuilder[] extendedHelp = new StringBuilder[4];
+	private static final StringBuilder[] extendedHelp = new StringBuilder[4];
 
 	static {
 

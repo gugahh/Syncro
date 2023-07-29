@@ -1,11 +1,8 @@
 package gustavo.syncro;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
+import gustavo.syncro.utils.SubtitleUtil;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -18,14 +15,16 @@ public class SyncroApp {
 	private File arquivoBackup;
 	private static final String howToGetHelpStr;
 
+	private static final SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
+
 	static {
 		howToGetHelpStr = "Digite java -jar syncro.jar -help para obter ajuda.";
 	}
 
 	public SyncroApp(){
-		objetosLegenda = new ArrayList<Subtitle>();
-		arquivoOriginal = new ArrayList<String>();
-		posIndicesLegendas = new ArrayList<Integer>();
+		objetosLegenda = new ArrayList<>();
+		arquivoOriginal = new ArrayList<>();
+		posIndicesLegendas = new ArrayList<>();
 		fazerBackupLegenda = true;
 	}
 
@@ -53,7 +52,7 @@ public class SyncroApp {
 
 		/* Caso seja passado um valor de legenda inicial,
 		 * este deverá ser um inteiro positivo */
-		if(indiceLegendaInicial!=null){
+		if(indiceLegendaInicial != null){
 			try {
 				int temp = Integer.parseInt( indiceLegendaInicial );
 				// Se uma excessão NÃO foi lançada, o int é válido.
@@ -115,7 +114,7 @@ public class SyncroApp {
 			if(tempo.charAt(0)=='-'){
 				intSinal = -1;
 			}
-			tempo=tempo.substring(1, tempo.length()); //Excluindo o sinal da String
+			tempo = tempo.substring(1, tempo.length()); //Excluindo o sinal da String
 		}
 
 		if(tempo.charAt(tempo.length()-1)=='s' || tempo.charAt(tempo.length()-1)=='S'){
@@ -131,18 +130,18 @@ public class SyncroApp {
 			}
 
 			int segundos = Integer.parseInt(pedacos[pedacos.length-1]) * 1000;
-			if(segundos>59000) {
+			if(segundos > 59000) {
 				System.out.println("Valor de segundos informado e invalido.");
 				System.exit(0);
 			}
 			int tempoEmMillis = segundos;
 
-			if(pedacos.length>1){ //minutos
+			if(pedacos.length > 1){ //minutos
 				int minutos = Integer.parseInt(pedacos[pedacos.length-2]) * 1000 * 60;
 				tempoEmMillis += minutos;
 			}
 
-			if(pedacos.length==3){ //horas
+			if(pedacos.length == 3){ //horas
 				tempoEmMillis += Integer.parseInt(pedacos[pedacos.length-3]) * 1000 * 3600;
 			}
 			return tempoEmMillis * intSinal;
@@ -202,26 +201,32 @@ public class SyncroApp {
 	 * deve ser logicamente numérico. Satisfeitas estas condições, armazena-se a posição
 	 * (Nº de linha) que contém o índice). */
 	void localizaIndicesLegendas(){
+		// System.out.println(">> Entrou em localizaIndicesLegendas");
+
 		if(arquivoOriginal.size() < 2) return; //nada a fazer
 
 		String linhaAtual = null;
-		for(int idx=1; idx<arquivoOriginal.size(); idx++){
+		for(int idx=1; idx < arquivoOriginal.size(); idx++){
 
 			/* Procurando linhas com timestamps:
 			 * Estas deverão ter o formato "00:00:01,520 --> 00:00:03,541" */
 			linhaAtual = arquivoOriginal.get(idx);
-			if(linhaAtual.length()==29 && isFormatoLinhaTimeStamp(linhaAtual)) {
+
+			if(linhaAtual.trim().isEmpty()) continue; // Linha em branco, ignorar.
+
+			if(linhaAtual.length() == 29 && sbtUtil.isFormatoLinhaTimeStamp(linhaAtual)) {
 				//Linha atual é uma linha de timestamps.
 				//Linha anterior, então, DEVERIA ser uma linha de índices.
 				try {
 					Integer.parseInt( arquivoOriginal.get(idx-1) );
 					// Se uma excessão NÃO foi lançada, bloco id + tempo é correto.
 					//Adicionar a linha de índice ao array de posições.
-					posIndicesLegendas.add(new Integer(idx-1));
+					posIndicesLegendas.add(idx - 1);
 					//System.out.println("Achou: " + arquivoOriginal.get(idx-1));
 				} catch( NumberFormatException e){}
 			}
 		}
+		// System.out.println("<< Saiu de localizaIndicesLegendas");
 	}
 
 	/* 3ª iteração:
@@ -229,7 +234,13 @@ public class SyncroApp {
 	 * Já testamos e sabemos quais linhas contém um índice, e quais
 	 * linhas contém timestamps válidos. */
 	void criaArraySubtitles() {
+		// System.out.println(">> Entrou em criaArraySubtitles");
+
+		// System.out.println("posIndicesLegendas.size(): " + posIndicesLegendas.size());
+
 		for(int idx=0; idx < posIndicesLegendas.size(); idx++) {
+
+			// System.out.println("Processando idx :" + String.valueOf(idx));
 
 			int indiceLegenda	= Integer.parseInt(arquivoOriginal.get( posIndicesLegendas.get(idx) ));
 			String startTime	= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(0, 12);
@@ -256,6 +267,8 @@ public class SyncroApp {
 				sub.appendTexto( tempString );
 			}
 		}
+		printAllSubtitleObjects();
+		// System.out.println("<< Saiu de criaArraySubtitles");
 	}
 
 	/* Usado para atrasar (ou adiantar) TODAS as legendas
@@ -333,27 +346,6 @@ public class SyncroApp {
 		}
 	}
 
-	/* Verifica se uma linha é uma linha de timeStamps.
-	 * Formato: "00:00:01,520 --> 00:00:03,541" */
-	private static boolean isFormatoLinhaTimeStamp(String linha){
-		if(linha.length()!=29) return false;
-
-		//Testando a hora de início da legenda.
-		try{
-			Subtitle.convertSubtitleTimeStampStringToInt(linha.substring(0, 12));
-		} catch(NumberFormatException e) {
-			return false; // Se deu erro, desistir.
-		}
-
-		//Testando a hora de fim da legenda.
-		try{
-			Subtitle.convertSubtitleTimeStampStringToInt(linha.substring(17, 29));
-		} catch(NumberFormatException e) {
-			return false; // Se deu erro, desistir.
-		}
-		return true;
-	}
-
 	/* Permite determinar se será feito (ou não) o backup do arquivo de legenda.*/
 	public void setFazerBackupLegenda(boolean b){
 		this.fazerBackupLegenda = b;
@@ -370,7 +362,7 @@ public class SyncroApp {
 
 	/* Utilizado para debugar ArrayList de linhas lidas do arquivo de legenda */
 	void printAllLines(){
-		Iterator i = arquivoOriginal.iterator();
+		Iterator<String> i = arquivoOriginal.iterator();
 		while(i.hasNext()){
 			System.out.println(i.next());
 		}
@@ -378,7 +370,7 @@ public class SyncroApp {
 
 	/* Utilizado para debugar o ArrayList de todos os objetos sbutitle encontrados */
 	void printAllSubtitleObjects(){
-		Iterator i = objetosLegenda.iterator();
+		Iterator<Subtitle> i = objetosLegenda.iterator();
 		while(i.hasNext()){
 			System.out.println(i.next().toString());
 		}
@@ -386,14 +378,14 @@ public class SyncroApp {
 
 	public static void main(String[] args) throws IOException {
 
-
-		if(args.length==0){
+		if(args.length == 0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
 			SyncroHelp.printBasicHelp();
 			System.exit(0);
 		}
 
-		if(args.length>0 && 
+		// TODO: Usar regex para simplificar abaixo.
+		if(args.length > 0 &&
 				(args[0].equalsIgnoreCase("-help") || 
 						args[0].equalsIgnoreCase("-h") ||
 						args[0].equalsIgnoreCase("/help") ||
@@ -405,7 +397,7 @@ public class SyncroApp {
 		}
 
 
-		if(args.length==1){ //Usu quer algum tipo de alteracao, mas nao informou arquivo
+		if(args.length == 1){ //Usu quer algum tipo de alteracao, mas nao informou arquivo
 			System.out.println("\tO parametro arquivo (de legenda) e obrigatorio");
 			System.out.println("\tpara realizar qualquer operacao.");
 			System.out.println(howToGetHelpStr);
@@ -417,7 +409,7 @@ public class SyncroApp {
 			/* Usu solicitou ajustar legenda.
 			 * Testando consitência de parâmetros de entrada */
 
-			if(args.length==2){ //Usu informou arquivo, mas nao o tempo de ajuste
+			if(args.length == 2){ //Usu informou arquivo, mas nao o tempo de ajuste
 				System.out.println("\tO parametro tempo (de ajuste) e obrigatorio");
 				System.out.println("\tpara realizar esta operacao.");
 				System.out.println(howToGetHelpStr);
@@ -436,14 +428,14 @@ public class SyncroApp {
 
 				String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
 
-				if(args.length>=4){
+				if(args.length >= 4){
 					//Args[3] pode ser um índice de legenda (opc) ou -nobak.
 					if(args[3].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
 						s.setFazerBackupLegenda(false);
 					} else indiceLegendaInicial = args[3];
 				}
 
-				if(args.length==5){ //O quarto parametro SÓ PODE ser referente ao Backup.
+				if(args.length == 5){ //O quarto parametro SÓ PODE ser referente ao Backup.
 					if(args[4].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
 						s.setFazerBackupLegenda(false);
 					} else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
@@ -499,7 +491,7 @@ public class SyncroApp {
 
 					String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
 
-					if(args.length==5){
+					if(args.length == 5){
 						//Args[4] só pode ser -nobak.
 						if(args[4].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
 							s.setFazerBackupLegenda(false);
@@ -542,4 +534,3 @@ public class SyncroApp {
 	}//main
 
 }
-

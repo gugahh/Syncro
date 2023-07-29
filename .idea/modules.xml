@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Syncro.iml" filepath="$PROJECT_DIR$/Syncro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/syncro.iml" filepath="$PROJECT_DIR$/syncro.iml" />
     </modules>
   </component>
 </project>

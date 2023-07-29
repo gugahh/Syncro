@@ -1,9 +1,14 @@
 Backlog do Projeto Syncro
 =============================
+1. Tratar o erro em subtitleMillisString, que não lança uma excessão tratada
+   quando o "timestamp" de uma legenda não corresponde a uma marcação de tempo
+   (exemplo: monk.srt). (OK)
 
-1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado.
+1.1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado.
 
 2. Permitir que o formato em segundos tenha valores fracionários (ex: +3,5s).
+
+2.1 Criar testes unitarios para a classe SubtitleUtil
 
 3. Criar validadores (classes específicas) para os formatos de ajuste (+00:00:01s / +01s).
 
