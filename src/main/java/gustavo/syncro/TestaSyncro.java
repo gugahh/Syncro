@@ -1,8 +1,8 @@
-package gustavo.synchro;
+package gustavo.syncro;
 
 import java.io.IOException;
 
-public class TestaSynchro {
+public class TestaSyncro {
 
 	enum TipoTeste {
 		ADJUST_TIME_NO_INDEX (
@@ -65,13 +65,13 @@ public class TestaSynchro {
 
 		// Passando apenas os parâmetros que se aplicam.
 		if(test.arg3==null){
-			SynchroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2 } );
+			SyncroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2 } );
 		}
 		if(test.arg3!=null && test.arg4==null){
-			SynchroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2, test.arg3} );
+			SyncroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2, test.arg3} );
 		}
 		if(test.arg4!=null){
-			SynchroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2, test.arg3, test.arg4} );
+			SyncroApp.main( new String[]{test.acao, test.arquivoLegenda, test.arg2, test.arg3, test.arg4} );
 		}
 	} //main
 }

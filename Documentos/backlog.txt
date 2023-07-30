@@ -1,0 +1,40 @@
+Backlog do Projeto Syncro
+=============================
+1. Tratar o erro em subtitleMillisString, que não lança uma excessão tratada
+   quando o "timestamp" de uma legenda não corresponde a uma marcação de tempo
+   (exemplo: monk.srt). (OK)
+
+1.1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado.
+
+2. Permitir que o formato em segundos tenha valores fracionários (ex: +3,5s).
+
+2.1 Criar testes unitarios para a classe SubtitleUtil
+
+3. Criar validadores (classes específicas) para os formatos de ajuste (+00:00:01s / +01s).
+
+4. Refatorar o codigo para facilitar "instalar" novos modos
+    - cada modo deve ter seu proprio arquivo independente de rotinas.
+    - cada modo deve possuir seu proprio arquivo de help
+    - Uma classe principal escolhe entre um modo ou outro, e repassa os parametros.
+    - As rotinas de cado modo incluem validação de seus parâmetros.
+
+5. Criar o modo "copyCat":
+    - param: legenda de exemplo
+    - param: posição inicial da legenda de exemplo (ex: Legenda 15)
+    - param: posição final da legenda de exemplo (ex: Legenda 90)
+    - param: legenda de destino
+    - param: posição inicial da legenda de destino (ex: Legenda 21)
+    - Lançar erro caso as legenda de destino seja menor do que a de origem
+        (ex: especificar "exemplo" de legenda de 15 a 30;
+        "destino" também começando em 15, mas não existe a legenda 30 em destino).
+
+6. Forçar conversão de ANSI para UTF-8. Caso já seja UTF-8, não fazer nada.
+    (se possível, fazer a conversão automaticamente).
+
+7. Criar o modo proporcional "proportional" (caso o CopyCat não resolva):
+    - Informar legenda de início (obrigatória. Ex: 15)
+    - Informar legenda de término (obrigatória; Ex: 39)
+    - Informar a hora real da legenda de término (ex: 01:20:39s)
+    - Todas as legendas entre a legenda 15 e a 39 serão ajustadas proporcionalmente,
+      recebendo a última (a 39), 100% do ajuste de tempo, e a primeira (a 15), 0% de ajuste.
+    - Legendas após a legenda de término (ex: 40 em diante), todas receberão 100% de ajuste.
