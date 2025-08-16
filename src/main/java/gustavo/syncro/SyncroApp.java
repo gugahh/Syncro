@@ -1,103 +1,44 @@
 package gustavo.syncro;
 
+import gustavo.syncro.actions.RenumerarAction;
+import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleUtil;
+import gustavo.syncro.actions.TimeAdjustAction;
 import gustavo.syncro.utils.TimeConversionUtil;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class SyncroApp {
 
-	ArrayList<Subtitle> objetosLegenda;
-	ArrayList<String> arquivoOriginal;
-	ArrayList<Integer> posIndicesLegendas;
+	private ArrayList<Subtitle> objetosLegenda1;
+	private ArrayList<String> arquivoOriginal;
+	private ArrayList<Integer> posIndicesLegendas;
 	private boolean fazerBackupLegenda;
 
 	private static final SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
 	private static final TimeConversionUtil timeConversionUtil = TimeConversionUtil.getInstance();
 
+	private static final TimeAdjustAction TIME_ADJUST_ACTION = TimeAdjustAction.getInstance();
+
+	private static final RenumerarAction renumerarAction = RenumerarAction.getInstance();
+
 	public SyncroApp(){
-		objetosLegenda = new ArrayList<>();
+		objetosLegenda1 = new ArrayList<Subtitle>();
 		arquivoOriginal = new ArrayList<>();
 		posIndicesLegendas = new ArrayList<>();
 		fazerBackupLegenda = true;
 	}
 
-	/* Utilizado para testar a consistência dos parâmetros enviados,
-	 * Quando a opção selecionada for AJUSTAR o tempo das legendas.
-	 * Qualquer inconsistência fará o aplicativo dar exit(). */
-	private static void testaParamsEntradaAdjust(String fileName, String tempoAjuste, String indiceLegendaInicial) {
-
-		// Testando a consistência do arquivo de legenda enviado.
-		File arquivoLegenda = new File(fileName);
-		if(!arquivoLegenda.exists()){
-			System.out.println("\tErro: O arquivo solicitado nao existe.");
-			System.out.println(HelpUtil.howToGetHelpStr);
-			System.exit(0);
-		}
-
-		/* Testando o tempo de ajuste informado. */
-		try {
-			timeConversionUtil.getMillisFromUserString(tempoAjuste);
-		} catch(NumberFormatException e) {
-			System.out.println("\tErro: O tempo para ajuste da legenda informado nao e valido..");
-			System.out.println(HelpUtil.howToGetHelpStr);
-			System.exit(0);
-		}
-
-		/* Caso seja passado um valor de legenda inicial,
-		 * este deverá ser um inteiro positivo */
-		if(indiceLegendaInicial != null){
-			try {
-				int temp = Integer.parseInt( indiceLegendaInicial );
-				// Se uma excessão NÃO foi lançada, o int é válido.
-				// Verificando de é válido (>= 1).
-				if(temp < 1){ //Erro
-					System.out.println("\tErro: O indice da 1a. legenda a ser modificada deve ser\n\tum numero inteiro maior ou igual a 1.");
-					System.out.println(HelpUtil.howToGetHelpStr);
-					System.exit(0);
-				}
-			} catch( NumberFormatException e){
-				System.out.println("\tErro: O indice da 1a. legenda deve ser um numero inteiro.");
-				System.out.println(HelpUtil.howToGetHelpStr);
-				System.exit(0);
-			}
-		}
+	public List<Subtitle> getListaLegendas1() {
+		return objetosLegenda1;
 	}
 
-	/* Utilizado para testar a consistência dos parâmetros enviados,
-	 * Quando a opção selecionada for RENUMERAR legendas.
-	 * Qualquer inconsistência fará o aplicativo dar exit(). */
-	private static void testaParamsEntradaRenum(String fileName, String indiceLegendaInic, String indiceLegendaDesejada) {
 
-		// Testando a consistência do arquivo de legenda enviado.
-		File arquivoLegenda = new File(fileName);
-		if(!arquivoLegenda.exists()){
-			System.out.println("\tErro: O arquivo solicitado nao existe.");
-			System.out.println(HelpUtil.howToGetHelpStr);
-			System.exit(0);
-		}
-
-		//Verificando se os índices de legendas informados são inteiros.
-		try {
-			int inic = Integer.parseInt(indiceLegendaInic);
-			int fim = Integer.parseInt(indiceLegendaDesejada);
-			if(inic < 1 || fim < 1){
-				System.out.println("\tErro: ambos os indice da legenda a ser modificada e o indice desejado ");
-				System.out.println("\tdevem ser numeros inteiros positivos, e maiores que zero.");
-				System.out.println(HelpUtil.howToGetHelpStr);
-				System.exit(0);
-			}
-		} catch(NumberFormatException e) {
-			System.out.println("\tErro: ambos os indice da legenda a ser modificada e o indice desejado devem ser numeros inteiros.");
-			System.out.println(HelpUtil.howToGetHelpStr);
-			System.exit(0);
-		}
-
-	}
 
 	/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 	 * Sistema gera uma cópia backup do arquivo de legendas. */
@@ -197,7 +138,7 @@ public class SyncroApp {
 			String endTime		= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(17, 29);
 
 			Subtitle sub = new Subtitle(indiceLegenda, startTime, endTime);
-			objetosLegenda.add(sub);
+			objetosLegenda1.add(sub);
 
 			/*	Para se obter o texto da legenda, há que se obter a posição de início do próximo item legenda;
 			 * Caso se esteja processando a última legenda, pegar linhas até o fim do arrayList. */
@@ -221,41 +162,18 @@ public class SyncroApp {
 		// System.out.println("<< Saiu de criaArraySubtitles");
 	}
 
-	/* Usado para atrasar (ou adiantar) TODAS as legendas
-	 * pelo tempo definido como parâmetro;
-	 * Params: id da legenda a partir da qual fazer a alteração;
-	 * 			tempo desejado de ajuste (milisegundos). */
-	void modifytime(int timeInMilis, int indice) {
-		/* Teste: se o valor for negativo (adiantamento), a primeira
-		 * legenda não poderá ficar antes do segundo zero. */
-		if(timeInMilis < 0){
-			Subtitle st = objetosLegenda.get(0);
-			if(st.getId() >= indice && st.getStartTime() + timeInMilis < 0){
-				System.out.println("Erro: a primeira legenda não pode ser adiantada para antes do segundo zero.");
-				System.exit(0);
-			}
-		}
-
-		for(int i=0; i < objetosLegenda.size(); i++){
-			Subtitle st = objetosLegenda.get(i);
-			if(st.getId() >= indice) {
-				st.setStartTime(st.getStartTime() + timeInMilis);
-				st.setEndTime(st.getEndTime() + timeInMilis);
-			}
-		}
-	}
-
 	/* Usado renumerar TODAS as legendas
 	 * iguais ou maiores que o indice (initialIndex) para
 	 * newIndex + sequencialDaLegenda. */
+	// TODO: Mover para RenumerarAction
 	private void modifyIndiceLegendas(String initialIndex, String newIndex) {
 		boolean valorAModificarFoiEncontrado = false;
 		//Será usado para ajustar a legenda desejada e as subsequentes
 		int intInitialIndex = Integer.parseInt(initialIndex);
 		int modificador = Integer.parseInt(newIndex) - intInitialIndex;
 
-		for(int i=0; i < objetosLegenda.size(); i++){
-			Subtitle st = objetosLegenda.get(i);
+		for(int i=0; i < objetosLegenda1.size(); i++){
+			Subtitle st = objetosLegenda1.get(i);
 			if(st.getId() >= intInitialIndex) {
 				valorAModificarFoiEncontrado = true;
 				st.setId(st.getId() + modificador);
@@ -271,13 +189,14 @@ public class SyncroApp {
 
 
 	/* Salva o arquivo de legendas novamente, SOBRE o arquivo de origem. */
+	// TODO: mover para GravaLegendaUtil (novo)
 	void saveChangedSubtitleFile(String fileName) {
 		PrintWriter writer = null;
 
 		try {
 				writer = new PrintWriter(new FileWriter(fileName));
 
-				for(Subtitle st : objetosLegenda){
+				for(Subtitle st : objetosLegenda1){
 					writer.println(st.getId());
 					writer.print(st.getStartTimeAsString());
 					writer.print(" --> ");
@@ -318,9 +237,9 @@ public class SyncroApp {
 		}
 	}
 
-	/* Utilizado para debugar o ArrayList de todos os objetos sbutitle encontrados */
+	/* Utilizado para debugar o ArrayList de todos os objetos subtitle encontrados */
 	void printAllSubtitleObjects(){
-		Iterator<Subtitle> i = objetosLegenda.iterator();
+		Iterator<Subtitle> i = objetosLegenda1.iterator();
 		while(i.hasNext()){
 			System.out.println(i.next().toString());
 		}
@@ -379,7 +298,8 @@ public class SyncroApp {
 
 				if(args.length >= 4){
 					//Args[3] pode ser um índice de legenda (opc) ou -nobak.
-					if(args[3].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
+					if(args[3].equalsIgnoreCase("-nobak") ||
+							args[3].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
 						s.setFazerBackupLegenda(false);
 					} else indiceLegendaInicial = args[3];
 				}
@@ -390,14 +310,18 @@ public class SyncroApp {
 					} else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
 						System.out.println("\tParametro invalido / desconhecido.");
 						System.out.println(HelpUtil.howToGetHelpStr);
-						System.exit(0);
+						System.exit(-1);
 					}
 				}
 
 				/* Nº de parâmetros passados e ordem é correta.
 				 * Testando a consistência de cada um dos parâmetros. */
-				testaParamsEntradaAdjust(args[1], args[2], indiceLegendaInicial); //Caso passe, tudo Ok.
-
+				String msgTesteAjuste = TIME_ADJUST_ACTION.testaParamsEntradaAdjust(args[1], args[2], indiceLegendaInicial); //Caso passe, tudo Ok.
+				if (msgTesteAjuste != null) {
+					System.out.println(msgTesteAjuste);
+					System.out.println(HelpUtil.howToGetHelpStr);
+					System.exit(-1);
+				}
 				/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 				 * Este método também cria uma cópia backup do arquivo de legenda. */
 				s.readFromFile( args[1]);
@@ -411,9 +335,19 @@ public class SyncroApp {
 
 				//Efetua alterações de tempo solicitadas.
 				int indicelegendaInt = 1;
-				//caso o Usu tenha informado um valor válido de em qual legenda iniciar , utilizá-lo.
+				//caso o Usu tenha informado um valor válido de em qual legenda iniciar, utilizá-lo.
 				if(indiceLegendaInicial!= null) indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
-				s.modifytime(timeConversionUtil.getMillisFromUserString(args[2]), indicelegendaInt);
+
+				try {
+					TIME_ADJUST_ACTION.modificaTempoTodasLegendas(s.getListaLegendas1(),
+							timeConversionUtil.getMillisFromUserString(args[2]),
+							indicelegendaInt
+							);
+					// s.modifytime(timeConversionUtil.getMillisFromUserString(args[2]), indicelegendaInt);
+				} catch (PosicaoLegendaInvalidaException plie) {
+					plie.printStackTrace();
+					System.exit(-1);
+				}
 
 				//Salva as alterações no arquivo de origem.
 				s.saveChangedSubtitleFile(args[1]);
@@ -450,13 +384,19 @@ public class SyncroApp {
 							//Parâmetro inválido. Unica opção é -nobak.
 							System.out.println("\tparametro incorreto");
 							System.out.println(HelpUtil.howToGetHelpStr);
-							System.exit(0);
+							System.exit(-1);
 						}
 					}
 
 					/* Nº de parâmetros passados e ordem é correta.
 					 * Testando a consistência de cada um dos parâmetros. */
-					testaParamsEntradaRenum(args[1], args[2], args[3]); //Caso passe, tudo Ok.
+					String retornoTestaRenumerar = renumerarAction.testaParamsEntradaRenum(args[1], args[2], args[3]);
+					if (retornoTestaRenumerar != null) {
+						System.out.println(retornoTestaRenumerar);
+						System.out.println(HelpUtil.howToGetHelpStr);
+						System.exit(-1);
+					}
+
 
 					/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 					 * Este método também cria uma cópia backup do arquivo de legenda. */
