@@ -34,3 +34,6 @@ target/
 
 #Outros
 *.old
+
+#Backups de Legendas
+Backup_*.srt

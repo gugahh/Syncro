@@ -1,6 +1,8 @@
 package gustavo.syncro;
 
+import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleUtil;
+import gustavo.syncro.utils.TimeConversionUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -12,14 +14,10 @@ public class SyncroApp {
 	ArrayList<String> arquivoOriginal;
 	ArrayList<Integer> posIndicesLegendas;
 	private boolean fazerBackupLegenda;
-	private File arquivoBackup;
-	private static final String howToGetHelpStr;
 
 	private static final SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
-	static {
-		howToGetHelpStr = "Digite java -jar syncro.jar -help para obter ajuda.";
-	}
+	private static final TimeConversionUtil timeConversionUtil = TimeConversionUtil.getInstance();
 
 	public SyncroApp(){
 		objetosLegenda = new ArrayList<>();
@@ -37,16 +35,16 @@ public class SyncroApp {
 		File arquivoLegenda = new File(fileName);
 		if(!arquivoLegenda.exists()){
 			System.out.println("\tErro: O arquivo solicitado nao existe.");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 
 		/* Testando o tempo de ajuste informado. */
 		try {
-			getMillisFromUserString(tempoAjuste);
+			timeConversionUtil.getMillisFromUserString(tempoAjuste);
 		} catch(NumberFormatException e) {
 			System.out.println("\tErro: O tempo para ajuste da legenda informado nao e valido..");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 
@@ -59,12 +57,12 @@ public class SyncroApp {
 				// Verificando de é válido (>= 1).
 				if(temp < 1){ //Erro
 					System.out.println("\tErro: O indice da 1a. legenda a ser modificada deve ser\n\tum numero inteiro maior ou igual a 1.");
-					System.out.println(howToGetHelpStr);
+					System.out.println(HelpUtil.howToGetHelpStr);
 					System.exit(0);
 				}
 			} catch( NumberFormatException e){
 				System.out.println("\tErro: O indice da 1a. legenda deve ser um numero inteiro.");
-				System.out.println(howToGetHelpStr);
+				System.out.println(HelpUtil.howToGetHelpStr);
 				System.exit(0);
 			}
 		}
@@ -79,7 +77,7 @@ public class SyncroApp {
 		File arquivoLegenda = new File(fileName);
 		if(!arquivoLegenda.exists()){
 			System.out.println("\tErro: O arquivo solicitado nao existe.");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 
@@ -90,101 +88,51 @@ public class SyncroApp {
 			if(inic < 1 || fim < 1){
 				System.out.println("\tErro: ambos os indice da legenda a ser modificada e o indice desejado ");
 				System.out.println("\tdevem ser numeros inteiros positivos, e maiores que zero.");
-				System.out.println(howToGetHelpStr);
+				System.out.println(HelpUtil.howToGetHelpStr);
 				System.exit(0);
 			}
 		} catch(NumberFormatException e) {
 			System.out.println("\tErro: ambos os indice da legenda a ser modificada e o indice desejado devem ser numeros inteiros.");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 
 	}
-
-	/* Utilizado para converter uma String contendo o tempo para adiantar
-	 * ou atrasar as legendas para um valor em milisegundos;
-	 * Lança uma NumberFormatException caso não consiga converter.]
-	 * Ele pode possuir qualquer uma das seguintes máscaras:
-	 * 01:10s, +01:10s, -15:10,012, -1,103, 0,003
-	 * (sinais são sempre aceitos,e o sinal '+' é sempre opcional).
-	 * */
-	private static int getMillisFromUserString(String tempo) throws NumberFormatException {
-		int intSinal = 1;
-		if(tempo.charAt(0)=='-' || tempo.charAt(0)=='+') { //Um sinal foi passado: (-) ou (+) (opcional)
-			if(tempo.charAt(0)=='-'){
-				intSinal = -1;
-			}
-			tempo = tempo.substring(1, tempo.length()); //Excluindo o sinal da String
-		}
-
-		if(tempo.charAt(tempo.length()-1)=='s' || tempo.charAt(tempo.length()-1)=='S'){
-			//Usuário utilizou a notação de segundos.
-			tempo=tempo.substring(0, tempo.length()-1); //Excluindo o "S", de segundos.
-			/* nesta notação, pedaços de tempo devem ser separados por
-			 * dois pontos; vírgulas NÃO são permitidas. */
-			String[] pedacos = tempo.split(":");
-
-			//Testando os pedaços
-			if(pedacos.length > 3){
-				throw new NumberFormatException(); //No máximo é permitido hh:mm:ss.
-			}
-
-			int segundos = Integer.parseInt(pedacos[pedacos.length-1]) * 1000;
-			if(segundos > 59000) {
-				System.out.println("Valor de segundos informado e invalido.");
-				System.exit(0);
-			}
-			int tempoEmMillis = segundos;
-
-			if(pedacos.length > 1){ //minutos
-				int minutos = Integer.parseInt(pedacos[pedacos.length-2]) * 1000 * 60;
-				tempoEmMillis += minutos;
-			}
-
-			if(pedacos.length == 3){ //horas
-				tempoEmMillis += Integer.parseInt(pedacos[pedacos.length-3]) * 1000 * 3600;
-			}
-			return tempoEmMillis * intSinal;
-
-		} else {
-			System.out.println("Este formato numerico ainda nao esta implementado. Lamento.");
-			System.exit(0);
-		}
-		return 0; //Com sorte nunca chegaremos aqui
-	}
-
 
 	/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 	 * Sistema gera uma cópia backup do arquivo de legendas. */
 	void readFromFile(String fileName) throws IOException{
 
+		File arquivoBackup;
 		File arquivoLegenda = new File(fileName);
 
 		LineNumberReader bfread = null;
 		PrintWriter writer = null;
-		String currentLine = null;
+		String currentLine;
 
 		try {
 			bfread = new LineNumberReader(new FileReader(arquivoLegenda)); //Tentado abrir arquivo. Operação pode falhar.
 
-			if(fazerBackupLegenda){
+			if (fazerBackupLegenda) {
 				arquivoBackup = new File("Backup_" + fileName.replace(".srt", "") + "_" + System.currentTimeMillis() + ".srt");
 				writer = new PrintWriter(new FileWriter(arquivoBackup));
 			}
 
-			while( (currentLine=bfread.readLine()) != null ){ // Loop: Lendo todas as linhas do arquivo texto até o fim.
+			while ((currentLine = bfread.readLine()) != null) { // Loop: Lendo todas as linhas do arquivo texto até o fim.
 
 				//Escrevendo cópia backup
-				if(fazerBackupLegenda){
+				if (fazerBackupLegenda) {
 					writer.println(currentLine);
 				}
 
 				//Carregando ArrayList
 				currentLine = currentLine.trim();
-				if(currentLine.length()>0){ //Evitando linhas em branco
+				if (currentLine.length() > 0) { //Evitando linhas em branco
 					arquivoOriginal.add(currentLine);
 				}
 			}
+		} catch(NullPointerException np) {
+			np.printStackTrace();
 		} finally {
 			if(bfread!=null){
 				bfread.close();
@@ -205,7 +153,7 @@ public class SyncroApp {
 
 		if(arquivoOriginal.size() < 2) return; //nada a fazer
 
-		String linhaAtual = null;
+		String linhaAtual;
 		for(int idx=1; idx < arquivoOriginal.size(); idx++){
 
 			/* Procurando linhas com timestamps:
@@ -223,7 +171,9 @@ public class SyncroApp {
 					//Adicionar a linha de índice ao array de posições.
 					posIndicesLegendas.add(idx - 1);
 					//System.out.println("Achou: " + arquivoOriginal.get(idx-1));
-				} catch( NumberFormatException e){}
+				} catch( NumberFormatException e){
+					e.printStackTrace();
+				}
 			}
 		}
 		// System.out.println("<< Saiu de localizaIndicesLegendas");
@@ -251,14 +201,14 @@ public class SyncroApp {
 
 			/*	Para se obter o texto da legenda, há que se obter a posição de início do próximo item legenda;
 			 * Caso se esteja processando a última legenda, pegar linhas até o fim do arrayList. */
-			int posicaoFinal = 0;
+			int posicaoFinal;
 			if(idx < (posIndicesLegendas.size() -1)){ //Legenda NÃO é a última
 				posicaoFinal = posIndicesLegendas.get(idx+1); //Nº de linha onde inicia a próxima legenda.
 			}
 			else posicaoFinal = arquivoOriginal.size();
 
 			//Adicionando todas as linhas (texto das legendas) entre uma legenda e outra.
-			String tempString = null;
+			String tempString;
 			for(int g=posIndicesLegendas.get(idx)+2; g < posicaoFinal; g++) {
 				tempString = arquivoOriginal.get( g );
 				if(g>posIndicesLegendas.get(idx)+2){
@@ -267,7 +217,7 @@ public class SyncroApp {
 				sub.appendTexto( tempString );
 			}
 		}
-		printAllSubtitleObjects();
+		// printAllSubtitleObjects(); // Usado para Debugar.
 		// System.out.println("<< Saiu de criaArraySubtitles");
 	}
 
@@ -314,7 +264,7 @@ public class SyncroApp {
 		if(!valorAModificarFoiEncontrado){
 			//Não encontrei a legenda a ser renumerada. Avisar Usu. Sair.
 			System.out.println("\tO indice de legenda informado (que se desejava modificar) não foi encontrado.");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 	}
@@ -396,23 +346,22 @@ public class SyncroApp {
 			System.exit(0);
 		}
 
-
 		if(args.length == 1){ //Usu quer algum tipo de alteracao, mas nao informou arquivo
 			System.out.println("\tO parametro arquivo (de legenda) e obrigatorio");
 			System.out.println("\tpara realizar qualquer operacao.");
-			System.out.println(howToGetHelpStr);
+			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
 
 		if(args[0].equalsIgnoreCase("-adjust")){
 
-			/* Usu solicitou ajustar legenda.
-			 * Testando consitência de parâmetros de entrada */
+			/* Usuario solicitou ajustar legenda.
+			 * Testando consistência de parâmetros de entrada */
 
 			if(args.length == 2){ //Usu informou arquivo, mas nao o tempo de ajuste
 				System.out.println("\tO parametro tempo (de ajuste) e obrigatorio");
 				System.out.println("\tpara realizar esta operacao.");
-				System.out.println(howToGetHelpStr);
+				System.out.println(HelpUtil.howToGetHelpStr);
 				System.exit(0);
 			}
 
@@ -440,7 +389,7 @@ public class SyncroApp {
 						s.setFazerBackupLegenda(false);
 					} else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
 						System.out.println("\tParametro invalido / desconhecido.");
-						System.out.println(howToGetHelpStr);
+						System.out.println(HelpUtil.howToGetHelpStr);
 						System.exit(0);
 					}
 				}
@@ -464,10 +413,12 @@ public class SyncroApp {
 				int indicelegendaInt = 1;
 				//caso o Usu tenha informado um valor válido de em qual legenda iniciar , utilizá-lo.
 				if(indiceLegendaInicial!= null) indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
-				s.modifytime(getMillisFromUserString(args[2]), indicelegendaInt);
+				s.modifytime(timeConversionUtil.getMillisFromUserString(args[2]), indicelegendaInt);
 
 				//Salva as alterações no arquivo de origem.
 				s.saveChangedSubtitleFile(args[1]);
+
+				System.out.println("O Tempo das Legendas foi ajustado com sucesso.");
 			}
 		} else {
 			if(args[0].equalsIgnoreCase("-renum")) { //Usuário tenta renumerar legendas
@@ -475,7 +426,7 @@ public class SyncroApp {
 				if(args.length<4){ //Num de params menor que o esperado.
 					System.out.println("\tNumero de parametros incorreto");
 					System.out.println("\tpara realizar esta operacao.");
-					System.out.println(howToGetHelpStr);
+					System.out.println(HelpUtil.howToGetHelpStr);
 					System.exit(0);
 				}
 
@@ -498,7 +449,7 @@ public class SyncroApp {
 						} else {
 							//Parâmetro inválido. Unica opção é -nobak.
 							System.out.println("\tparametro incorreto");
-							System.out.println(howToGetHelpStr);
+							System.out.println(HelpUtil.howToGetHelpStr);
 							System.exit(0);
 						}
 					}
@@ -523,11 +474,13 @@ public class SyncroApp {
 					//Salva as alterações no arquivo de origem.
 					s.saveChangedSubtitleFile(args[1]);
 
+					System.out.println("O Índice das Legendas foi ajustado com sucesso.");
+
 				}//4 params
 			} else {
 				// Caso não se esteja ajustando tempo, num legenda OU solicitando help, param é invalido.
 				System.out.println("Parametro Invalido.");
-				System.out.println(howToGetHelpStr);
+				System.out.println(HelpUtil.howToGetHelpStr);
 				System.exit(0);
 			}
 		} //-adjust
