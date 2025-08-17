@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 /**
  * Classe responsavel por tudo o que for exclusivo a Renumerar Legendas
  */
-public class RenumerarAction {
+public class RenumerarAction extends AbstractAction {
 
     /* implementacao do singleton */
     private static final RenumerarAction instance = new RenumerarAction();
@@ -19,6 +19,11 @@ public class RenumerarAction {
 
     public static RenumerarAction getInstance() {
         return instance;
+    }
+
+    @Override
+    public void doAction(String[] args) {
+
     }
 
     /**

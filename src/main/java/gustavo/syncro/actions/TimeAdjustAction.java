@@ -8,7 +8,7 @@ import gustavo.syncro.utils.TimeConversionUtil;
 import java.io.File;
 import java.util.List;
 
-public class TimeAdjustAction {
+public class TimeAdjustAction extends AbstractAction {
 
     private static final TimeAdjustAction instance = new TimeAdjustAction();
 
@@ -19,6 +19,10 @@ public class TimeAdjustAction {
 
     private TimeAdjustAction(){}
 
+    @Override
+    public void doAction(String[] args) {
+
+    }
 
     /**
      * Utilizado para testar a consistência dos parâmetros enviados,
@@ -90,5 +94,6 @@ public class TimeAdjustAction {
             }
         }
     }
+
 
 }

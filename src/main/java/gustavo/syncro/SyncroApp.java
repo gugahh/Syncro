@@ -1,11 +1,11 @@
 package gustavo.syncro;
 
 import gustavo.syncro.actions.RenumerarAction;
+import gustavo.syncro.exceptions.FileReadException;
+import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
-import gustavo.syncro.utils.HelpUtil;
-import gustavo.syncro.utils.SubtitleUtil;
+import gustavo.syncro.utils.*;
 import gustavo.syncro.actions.TimeAdjustAction;
-import gustavo.syncro.utils.TimeConversionUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 public class SyncroApp {
 
 	private ArrayList<Subtitle> objetosLegenda1;
-	private ArrayList<String> arquivoOriginal;
+	private static ArrayList<String> arquivoOriginal;
 	private ArrayList<Integer> posIndicesLegendas;
 	private boolean fazerBackupLegenda;
 
@@ -38,51 +38,6 @@ public class SyncroApp {
 		return objetosLegenda1;
 	}
 
-
-
-	/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
-	 * Sistema gera uma cópia backup do arquivo de legendas. */
-	void readFromFile(String fileName) throws IOException{
-
-		File arquivoBackup;
-		File arquivoLegenda = new File(fileName);
-
-		LineNumberReader bfread = null;
-		PrintWriter writer = null;
-		String currentLine;
-
-		try {
-			bfread = new LineNumberReader(new FileReader(arquivoLegenda)); //Tentado abrir arquivo. Operação pode falhar.
-
-			if (fazerBackupLegenda) {
-				arquivoBackup = new File("Backup_" + fileName.replace(".srt", "") + "_" + System.currentTimeMillis() + ".srt");
-				writer = new PrintWriter(new FileWriter(arquivoBackup));
-			}
-
-			while ((currentLine = bfread.readLine()) != null) { // Loop: Lendo todas as linhas do arquivo texto até o fim.
-
-				//Escrevendo cópia backup
-				if (fazerBackupLegenda) {
-					writer.println(currentLine);
-				}
-
-				//Carregando ArrayList
-				currentLine = currentLine.trim();
-				if (currentLine.length() > 0) { //Evitando linhas em branco
-					arquivoOriginal.add(currentLine);
-				}
-			}
-		} catch(NullPointerException np) {
-			np.printStackTrace();
-		} finally {
-			if(bfread!=null){
-				bfread.close();
-			}
-			if(writer!=null){
-				writer.close();
-			}
-		}
-	}
 
 	/* 2ª Iteração:
 	 * Descobre quais das linhas obtidas representam um índice (de legenda).
@@ -187,38 +142,12 @@ public class SyncroApp {
 		}
 	}
 
-
-	/* Salva o arquivo de legendas novamente, SOBRE o arquivo de origem. */
-	// TODO: mover para GravaLegendaUtil (novo)
-	void saveChangedSubtitleFile(String fileName) {
-		PrintWriter writer = null;
-
-		try {
-				writer = new PrintWriter(new FileWriter(fileName));
-
-				for(Subtitle st : objetosLegenda1){
-					writer.println(st.getId());
-					writer.print(st.getStartTimeAsString());
-					writer.print(" --> ");
-					writer.println(st.getEndTimeAsString());
-					writer.println(st.getTexto());
-					writer.println(); //Legendas são separadas por uma linha em branco.
-				}
-				writer.println(); //A legenda é fechada com uma linha em branco a mais.
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if(writer!=null){
-				writer.close();
-			}
-		}
-	}
-
 	/* Permite determinar se será feito (ou não) o backup do arquivo de legenda.*/
 	public void setFazerBackupLegenda(boolean b){
 		this.fazerBackupLegenda = b;
 	}
+
+	public boolean getFazerBackupLegenda() { return this.fazerBackupLegenda; }
 
 	/* Utilizado para debugar ArrayList de índices de linhas em que começam legendas  */
 	void printIndicesLegendas(){
@@ -324,7 +253,14 @@ public class SyncroApp {
 				}
 				/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 				 * Este método também cria uma cópia backup do arquivo de legenda. */
-				s.readFromFile( args[1]);
+				//s.readFromFile( args[1]);
+				try {
+					FileReaderUtil.readFromFile( args[1], arquivoOriginal, false);
+				} catch (FileReadException e) {
+					System.out.println(e.getMessage());
+					System.out.println(HelpUtil.howToGetHelpStr);
+					System.exit(-1);
+				}
 
 				/* 2ª iteração: procurando linhas que contenham índices de legendas. */
 				s.localizaIndicesLegendas();
@@ -350,7 +286,14 @@ public class SyncroApp {
 				}
 
 				//Salva as alterações no arquivo de origem.
-				s.saveChangedSubtitleFile(args[1]);
+				// s.saveChangedSubtitleFile(args[1]);
+				try {
+					SubtitleFileUtil.saveChangedSubtitleFile(args[1], s.objetosLegenda1);
+				} catch (ArquivoLegendaWriteException e) {
+					System.out.println(e.getMessage());
+					System.out.println(HelpUtil.howToGetHelpStr);
+					System.exit(-1);
+				}
 
 				System.out.println("O Tempo das Legendas foi ajustado com sucesso.");
 			}
@@ -400,7 +343,14 @@ public class SyncroApp {
 
 					/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 					 * Este método também cria uma cópia backup do arquivo de legenda. */
-					s.readFromFile( args[1]);
+					// s.readFromFile( args[1]);
+					try {
+						FileReaderUtil.readFromFile( args[1], arquivoOriginal, false);
+					} catch (FileReadException e) {
+						System.out.println(e.getMessage());
+						System.out.println(HelpUtil.howToGetHelpStr);
+						System.exit(-1);
+					}
 
 					/* 2ª iteração: procurando linhas que contenham índices de legendas. */
 					s.localizaIndicesLegendas();
@@ -412,7 +362,14 @@ public class SyncroApp {
 					s.modifyIndiceLegendas(args[2], args[3]);
 
 					//Salva as alterações no arquivo de origem.
-					s.saveChangedSubtitleFile(args[1]);
+					// s.saveChangedSubtitleFile(args[1]);
+					try {
+						SubtitleFileUtil.saveChangedSubtitleFile(args[1], s.objetosLegenda1);
+					} catch (ArquivoLegendaWriteException e) {
+						System.out.println(e.getMessage());
+						System.out.println(HelpUtil.howToGetHelpStr);
+						System.exit(-1);
+					}
 
 					System.out.println("O Índice das Legendas foi ajustado com sucesso.");
 
