@@ -34,3 +34,6 @@ target/
 
 #Outros
 *.old
+
+.idea/sonarlint/
+.idea/jpa-buddy.xml
