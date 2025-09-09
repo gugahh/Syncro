@@ -5,16 +5,16 @@ import java.io.InputStreamReader;
 
 public class SyncroHelp {
 
-	private static final StringBuilder basicHelp = new StringBuilder("");
+	private static final StringBuilder basicHelp = new StringBuilder();
 	private static final StringBuilder[] extendedHelp = new StringBuilder[4];
 
 	static {
 
 		//Definido Help Básico.
-		basicHelp.append("-----------------------------------------------------------\n");
-		basicHelp.append("|  Syncro - um aplicativo para sincronizacao de Legendas  |\n");
-		basicHelp.append("|      (c) 2007, Gustavo Santos (gugahh.br@gmail.com)     |\n");
-		basicHelp.append("-----------------------------------------------------------\n");
+		basicHelp.append("------------------------------------------------------------\n");
+		basicHelp.append("|  Syncro - um aplicativo para sincronizacao de Legendas   |\n");
+		basicHelp.append("|      (c) 2007, 2025 Gustavo Santos (gugahh.br@gmail.com) |\n");
+		basicHelp.append("------------------------------------------------------------\n");
 		basicHelp.append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
 		basicHelp.append("  arquivo de legendas *.srt.\n");
 		basicHelp.append("- Este software e Freeware. Se gostar, mande-me um\n");
@@ -45,10 +45,11 @@ public class SyncroHelp {
 
 		//Tela 1:
 		extendedHelp[0].append("\n");
-		extendedHelp[0].append("-----------------------------------------------------------\n");
-		extendedHelp[0].append("|  Syncro - um aplicativo para sincronizacao de Legendas  |\n");
-		extendedHelp[0].append("|      (c) 2007, Gustavo Santos (gugahh@ig.com.br)        |\n");
-		extendedHelp[0].append("-----------------------------------------------------------\n");
+		extendedHelp[0].append("------------------------------------------------------------\n");
+		extendedHelp[0].append("|  Syncro - um aplicativo para sincronizacao de Legendas   |\n");
+		extendedHelp[0].append("|      (c) 2007, 2025 Gustavo Santos (gugahh.br@gmail.com) |\n");
+		extendedHelp[0].append("------------------------------------------------------------\n");
+
 		extendedHelp[0].append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
 		extendedHelp[0].append("  arquivo de legendas *.srt.\n");
 		extendedHelp[0].append("- Este software e Freeware. Se gostar, mande-me um\n");

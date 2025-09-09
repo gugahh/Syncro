@@ -1,7 +1,10 @@
 package gustavo.syncro.actions;
 
 import gustavo.syncro.Subtitle;
+import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
+import gustavo.syncro.exceptions.validacao.ValidacaoException;
 import gustavo.syncro.utils.HelpUtil;
+import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
 
 import java.io.File;
@@ -16,6 +19,8 @@ public class RenumerarAction extends AbstractAction {
     /* implementacao do singleton */
     private static final RenumerarAction instance = new RenumerarAction();
 
+    private boolean fazerBackupLegenda;
+
     // private constructor to avoid client applications using the constructor
     private RenumerarAction(){}
 
@@ -25,6 +30,75 @@ public class RenumerarAction extends AbstractAction {
 
     @Override
     public void doAction(String[] args) {
+
+        TimeAdjustAction timeAdjustAction = TimeAdjustAction.getInstance();
+        SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
+
+        List<Subtitle> listaLegendas = null;
+
+        if(args.length < 4){ //Num de params menor que o esperado.
+            System.out.println("\tNumero de parametros incorreto");
+            System.out.println("\tpara realizar esta operacao.");
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(0);
+        }
+
+        if(args.length >= 4) {
+            /* Nº de params é legal. Pode-se tentar comecar.
+             * No caso de qualquer método falhar a operação
+             * (execução da App) deve ser abortada. */
+
+            // args[0] args[1]   args[2]         args[3]           args[4] (opc)
+            //[-renum [arquivo] [indiceInicial] [renumerarPara] ] [-nobak]
+
+            String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
+
+            if (args.length == 5) {
+                //Args[4] só pode ser -nobak.
+                if (args[4].equalsIgnoreCase("-nobak")) { //Usu solicitou não fazer backup
+                    fazerBackupLegenda = false;
+                    System.out.println("Fazer Backup - falta implementar");
+                } else {
+                    //Parâmetro inválido. Unica opção é -nobak.
+                    System.out.println("\tparametro incorreto");
+                    System.out.println(HelpUtil.howToGetHelpStr);
+                    System.exit(-1);
+                }
+            }
+        } // if(args.length >= 4)
+
+        /* Nº de parâmetros passados e ordem é correta.
+         * Testando a consistência de cada um dos parâmetros. */
+        String retornoTestaRenumerar = this.testaParamsEntradaRenum(args[1], args[2], args[3]);
+        if (retornoTestaRenumerar != null) {
+            System.out.println(retornoTestaRenumerar);
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
+
+        try {
+            listaLegendas = sbtUtil.obtemListaLegendasFromFile(args[1]);
+        } catch (ValidacaoException e) {
+            throw new RuntimeException(e);
+        }
+
+        if (null == listaLegendas || listaLegendas.isEmpty()) {
+            throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
+        }
+
+        this.modifyIndiceLegendas(listaLegendas, args[2], args[3]);
+
+        //Salva as alterações no arquivo de origem.
+        // s.saveChangedSubtitleFile(args[1]);
+        try {
+            SubtitleFileUtil.saveChangedSubtitleFile(args[1], listaLegendas);
+        } catch (ArquivoLegendaWriteException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
+
+        System.out.println("O Índice das Legendas foi ajustado com sucesso.");
 
     }
 
