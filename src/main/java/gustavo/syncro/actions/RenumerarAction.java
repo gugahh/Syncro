@@ -1,9 +1,11 @@
 package gustavo.syncro.actions;
 
+import gustavo.syncro.Subtitle;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleUtil;
 
 import java.io.File;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -60,6 +62,32 @@ public class RenumerarAction extends AbstractAction {
         }
 
         return null; // Sucesso.
+    }
+
+    /* Usado renumerar TODAS as legendas
+     * iguais ou maiores que o indice (initialIndex) para
+     * newIndex + sequencialDaLegenda. */
+    public void modifyIndiceLegendas(List<Subtitle> objetosLegenda1,
+                                      String initialIndex,
+                                      String newIndex) {
+        boolean valorAModificarFoiEncontrado = false;
+        //Será usado para ajustar a legenda desejada e as subsequentes
+        int intInitialIndex = Integer.parseInt(initialIndex);
+        int modificador = Integer.parseInt(newIndex) - intInitialIndex;
+
+        for(int i=0; i < objetosLegenda1.size(); i++){
+            Subtitle st = objetosLegenda1.get(i);
+            if(st.getId() >= intInitialIndex) {
+                valorAModificarFoiEncontrado = true;
+                st.setId(st.getId() + modificador);
+            }
+        }
+        if(!valorAModificarFoiEncontrado){
+            //Não encontrei a legenda a ser renumerada. Avisar Usu. Sair.
+            System.out.println("\tO indice de legenda informado (que se desejava modificar) não foi encontrado.");
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(0);
+        }
     }
 
 }
