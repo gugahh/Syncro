@@ -3,22 +3,37 @@ package gustavo.syncro.actions;
 import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
 import gustavo.syncro.utils.HelpUtil;
+import gustavo.syncro.utils.SubtitleUtil;
 import gustavo.syncro.utils.TimeConversionUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TimeAdjustAction extends AbstractAction {
 
     private static final TimeAdjustAction instance = new TimeAdjustAction();
 
-    // private constructor to avoid client applications using the constructor
-    public static TimeAdjustAction getInstance() {
-        return instance;
-    }
+    private ArrayList<Subtitle> objetosLegenda1;
 
-    private TimeAdjustAction(){}
+    private static ArrayList<String> arquivoOriginal;
+    private ArrayList<Integer> posIndicesLegendas;
+    private boolean fazerBackupLegenda;
+    private static final SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
+    private static final TimeConversionUtil timeConversionUtil = TimeConversionUtil.getInstance();
+
+    private static final TimeAdjustAction TIME_ADJUST_ACTION = TimeAdjustAction.getInstance();
+
+    private static final RenumerarAction renumerarAction = RenumerarAction.getInstance();
+
+    /**
+     * Uma vez entendido que a acao a ser realizada eh o ajuste de tempo de legendas,
+     * todo o trabalho eh passado para esse classe; Validacoes e transformacoes
+     * devem estar aqui, sendo que validacoes devem retornar excessoes.
+     * args sao os argumentos da linha de comando (Main)
+     * @param args
+     */
     @Override
     public void doAction(String[] args) {
 
@@ -65,6 +80,13 @@ public class TimeAdjustAction extends AbstractAction {
         return null; // Zero erros encontrados.
     }
 
+    // private constructor to avoid client applications using the constructor
+    public static TimeAdjustAction getInstance() {
+        return instance;
+    }
+
+    private TimeAdjustAction(){}
+
     /* Usado para atrasar (ou adiantar) TODAS as legendas
      * pelo tempo definido como parâmetro;
      * Params:
@@ -73,6 +95,7 @@ public class TimeAdjustAction extends AbstractAction {
      * - id da legenda a partir da qual fazer a alteração
      * modifytime
      * 			 */
+
     public void modificaTempoTodasLegendas(
             List<Subtitle> objetosLegenda ,
             int timeInMilis,
@@ -94,6 +117,5 @@ public class TimeAdjustAction extends AbstractAction {
             }
         }
     }
-
 
 }

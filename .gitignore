@@ -37,3 +37,5 @@ target/
 
 #Backups de Legendas
 Backup_*.srt
+
+./idea/sonarlint/*.*

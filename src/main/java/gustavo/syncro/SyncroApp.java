@@ -4,6 +4,7 @@ import gustavo.syncro.actions.RenumerarAction;
 import gustavo.syncro.exceptions.FileReadException;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
+import gustavo.syncro.exceptions.validacao.ValidacaoException;
 import gustavo.syncro.utils.*;
 import gustavo.syncro.actions.TimeAdjustAction;
 
@@ -254,6 +255,7 @@ public class SyncroApp {
 				/* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
 				 * Este método também cria uma cópia backup do arquivo de legenda. */
 				//s.readFromFile( args[1]);
+                /*
 				try {
 					FileReaderUtil.readFromFile( args[1], arquivoOriginal, false);
 				} catch (FileReadException e) {
@@ -261,21 +263,33 @@ public class SyncroApp {
 					System.out.println(HelpUtil.howToGetHelpStr);
 					System.exit(-1);
 				}
+				*/
 
 				/* 2ª iteração: procurando linhas que contenham índices de legendas. */
-				s.localizaIndicesLegendas();
+				// s.localizaIndicesLegendas();
 
 				/* 3ª iteração: cria objetos Subtitle a partir das linhas de índices obtidas e
 				 * das linhas de legendas armazenadas anteriormente. */
-				s.criaArraySubtitles();
+				// s.criaArraySubtitles();
 
-				//Efetua alterações de tempo solicitadas.
+                List<Subtitle> listaLegendas = null;
+                try {
+                    listaLegendas = sbtUtil.obtemListaLegendasFromFile(args[1]);
+                } catch (ValidacaoException e) {
+                    throw new RuntimeException(e);
+                }
+
+                if (null == listaLegendas || listaLegendas.isEmpty()) {
+                    throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
+                }
+
+                //Efetua alterações de tempo solicitadas.
 				int indicelegendaInt = 1;
 				//caso o Usu tenha informado um valor válido de em qual legenda iniciar, utilizá-lo.
 				if(indiceLegendaInicial!= null) indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
 
 				try {
-					TIME_ADJUST_ACTION.modificaTempoTodasLegendas(s.getListaLegendas1(),
+					TIME_ADJUST_ACTION.modificaTempoTodasLegendas(listaLegendas,
 							timeConversionUtil.getMillisFromUserString(args[2]),
 							indicelegendaInt
 							);
@@ -288,7 +302,7 @@ public class SyncroApp {
 				//Salva as alterações no arquivo de origem.
 				// s.saveChangedSubtitleFile(args[1]);
 				try {
-					SubtitleFileUtil.saveChangedSubtitleFile(args[1], s.objetosLegenda1);
+					SubtitleFileUtil.saveChangedSubtitleFile(args[1], listaLegendas);
 				} catch (ArquivoLegendaWriteException e) {
 					System.out.println(e.getMessage());
 					System.out.println(HelpUtil.howToGetHelpStr);

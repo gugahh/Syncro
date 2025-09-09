@@ -3,11 +3,19 @@ package gustavo.syncro.utils;
 import gustavo.syncro.exceptions.FileReadException;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileReaderUtil {
 
     public static final String ERRO_LEITURA_LEGENDA = "Ocorreu um erro ao ler o arquivo de legenda %s";
+
+    public static List<String> readFromFile(String fileName
+    ) throws FileReadException, IOException {
+        List<String> stringList = new ArrayList<>();
+        readFromFile(fileName, stringList, false);
+        return stringList;
+    }
 
     /**
      * Le um arquivo fornecido, e o atribui cada uma das linhas do arquivo
@@ -19,6 +27,7 @@ public class FileReaderUtil {
      * @throws FileReadException
      * @throws IOException
      */
+    //TODO: tornar private.
     public static void readFromFile(String fileName,
                       List<String> stringList,
                       boolean fazerBackupLegenda

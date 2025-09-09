@@ -7,13 +7,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SubtitleFileUtil {
 
     public static final String ERRO_ESCRITA_LEGENDAS = "Erro ao escrever o arquivo de legendas %s";
 
     public static void saveChangedSubtitleFile(
-            String fileName, ArrayList<Subtitle> legendasList) throws ArquivoLegendaWriteException {
+            String fileName, List<Subtitle> legendasList) throws ArquivoLegendaWriteException {
         PrintWriter writer = null;
 
         try {
