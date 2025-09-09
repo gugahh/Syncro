@@ -39,8 +39,8 @@ public class SyncroApp {
 		}
 
 		if(args.length == 1){ //Usu quer algum tipo de alteracao, mas nao informou arquivo
-			System.out.println("\tO parametro arquivo (de legenda) e obrigatorio");
-			System.out.println("\tpara realizar qualquer operacao.");
+			System.out.println("\tO parametro de entrada nao foi compreendido.");
+			System.out.println("\tLeia o Help para selecionar a operacao adequada.");
 			System.out.println(HelpUtil.howToGetHelpStr);
 			System.exit(0);
 		}
