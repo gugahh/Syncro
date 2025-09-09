@@ -31,41 +31,36 @@ public class RenumerarAction extends AbstractAction {
     @Override
     public void doAction(String[] args) {
 
-        TimeAdjustAction timeAdjustAction = TimeAdjustAction.getInstance();
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
-        List<Subtitle> listaLegendas = null;
+        List<Subtitle> listaLegendas;
 
         if(args.length < 4){ //Num de params menor que o esperado.
             System.out.println("\tNumero de parametros incorreto");
             System.out.println("\tpara realizar esta operacao.");
             System.out.println(HelpUtil.howToGetHelpStr);
-            System.exit(0);
+            System.exit(-1);
         }
 
-        if(args.length >= 4) {
-            /* Nº de params é legal. Pode-se tentar comecar.
-             * No caso de qualquer método falhar a operação
-             * (execução da App) deve ser abortada. */
+        /* Se chegou aqui, o nº de params é legal.
+         * No caso de qualquer método falhar a operação
+         * (execução da App) deve ser abortada. */
 
-            // args[0] args[1]   args[2]         args[3]           args[4] (opc)
-            //[-renum [arquivo] [indiceInicial] [renumerarPara] ] [-nobak]
+        // args[0] args[1]   args[2]         args[3]           args[4] (opc)
+        //[-renum [arquivo] [indiceInicial] [renumerarPara] ] [-nobak]
 
-            String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
-
-            if (args.length == 5) {
-                //Args[4] só pode ser -nobak.
-                if (args[4].equalsIgnoreCase("-nobak")) { //Usu solicitou não fazer backup
-                    fazerBackupLegenda = false;
-                    System.out.println("Fazer Backup - falta implementar");
-                } else {
-                    //Parâmetro inválido. Unica opção é -nobak.
-                    System.out.println("\tparametro incorreto");
-                    System.out.println(HelpUtil.howToGetHelpStr);
-                    System.exit(-1);
-                }
+        if (args.length == 5) {
+            //Args[4] só pode ser -nobak.
+            if (args[4].equalsIgnoreCase("-nobak")) { //Usu solicitou não fazer backup
+                fazerBackupLegenda = false;
+                System.out.println("Fazer Backup - falta implementar");
+            } else {
+                //Parâmetro inválido. Unica opção é -nobak.
+                System.out.println("\tparametro incorreto");
+                System.out.println(HelpUtil.howToGetHelpStr);
+                System.exit(-1);
             }
-        } // if(args.length >= 4)
+        }
 
         /* Nº de parâmetros passados e ordem é correta.
          * Testando a consistência de cada um dos parâmetros. */
@@ -83,7 +78,10 @@ public class RenumerarAction extends AbstractAction {
         }
 
         if (null == listaLegendas || listaLegendas.isEmpty()) {
-            throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
+            // throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
+            System.out.println("Lista de Legendas eh nula ou vazia.");
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
         }
 
         this.modifyIndiceLegendas(listaLegendas, args[2], args[3]);
@@ -144,7 +142,9 @@ public class RenumerarAction extends AbstractAction {
     public void modifyIndiceLegendas(List<Subtitle> objetosLegenda1,
                                       String initialIndex,
                                       String newIndex) {
+
         boolean valorAModificarFoiEncontrado = false;
+
         //Será usado para ajustar a legenda desejada e as subsequentes
         int intInitialIndex = Integer.parseInt(initialIndex);
         int modificador = Integer.parseInt(newIndex) - intInitialIndex;
