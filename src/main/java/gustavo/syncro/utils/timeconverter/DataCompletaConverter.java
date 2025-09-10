@@ -6,8 +6,8 @@ import gustavo.syncro.exceptions.validacao.timestamp.TimestampNuloException;
 import java.util.regex.Pattern;
 
 /**
- * Converte datas no formato (+00:00:01s / -00:00:01s) para milisegundos;
- * Tambem aceita os formato +00:01s, 00:01s, +01s, 01s, +1s e 1s.
+ * Converte timestamps no formato (+00:00:01s / -00:00:01s) para milisegundos;
+ * Tambem aceita os formatos +00:01s, 00:01s, +01s, 01s, +1s e 1s.
  */
 public class DataCompletaConverter extends AbstractTimeConverter {
 
@@ -20,7 +20,7 @@ public class DataCompletaConverter extends AbstractTimeConverter {
     // Pattern +01s, +1s e 1s
     final Pattern DATE_PATTERN_3 = Pattern.compile( "^[+-]?[0-9]{1,2}[sS]$");
 
-    final String MSM_MASCARA_INVALIDA = "O tempo de ajuste informado não esta nas máscaras +00:00:01s, +00:01s, ou +01s";
+    final String MSG_MASCARA_INVALIDA = "O tempo de ajuste informado não esta nas máscaras +00:00:01s, +00:01s, ou +01s";
 
     @Override
     public boolean isAcceptedFormat(String txtCandidate) throws TimestampNuloException {
@@ -42,7 +42,7 @@ public class DataCompletaConverter extends AbstractTimeConverter {
         // Quem chama esse metodo tem que garantir que o texto usa as mascaras aceitas.
         // Esse erro nao deveria acontecer (erro de programacao).
         if (!this.isAcceptedFormat(txtSequence)) {
-            throw new TimestampInvalidoException(MSM_MASCARA_INVALIDA);
+            throw new TimestampInvalidoException(MSG_MASCARA_INVALIDA);
         }
 
         int intSinal = 1;
@@ -61,7 +61,7 @@ public class DataCompletaConverter extends AbstractTimeConverter {
 
         //Testando os pedaços
         if(pedacos.length > 3){
-            throw new TimestampInvalidoException(MSM_MASCARA_INVALIDA); //No máximo é permitido hh:mm:ss.
+            throw new TimestampInvalidoException(MSG_MASCARA_INVALIDA); //No máximo é permitido hh:mm:ss.
         }
 
         int segundos = Integer.parseInt(pedacos[pedacos.length-1]) * 1000;

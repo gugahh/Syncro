@@ -72,7 +72,7 @@ public class SyncroHelp {
 		extendedHelp[1].append("             Parametros arquivo, e tempo sao obrigatorios.\n");
 		extendedHelp[1].append("\n");
 		extendedHelp[1].append("       [arquivo]: Arquivo SRT que se deseja alterar. \n");
-		extendedHelp[1].append("                  Nomes com caminho completo sao validos.\n");
+		extendedHelp[1].append("                  Nomes com caminho completo sao validos, mas nao podem ter espacos.\n");
 		extendedHelp[1].append("\n");
 		extendedHelp[1].append("       [tempo]: Tempo que se deseja que as legendas sejam adiantadas/atrasadas.\n");
 		extendedHelp[1].append("		Pode ser positivo (atrasar) ou negativo (adiantar).\n");
@@ -81,10 +81,9 @@ public class SyncroHelp {
 		extendedHelp[1].append("                    01:10s     - para atrasar 1 minuto e dez segundos;\n");
 		extendedHelp[1].append("                   +01:10s     - para atrasar 1 minuto e dez segundos\n");
 		extendedHelp[1].append("                                 (o sinal positivo e opcional);\n");
-		extendedHelp[1].append("                   -15:10,012  - para adiantar 15 minutos, 10 segundos e\n");
-		extendedHelp[1].append("                                 12 milesimos.\n");
-		extendedHelp[1].append("                   -1,103      - para adiantar 1 segundo e 103 milésimos.\n");
-		extendedHelp[1].append("                    0,003      - para adiantar 3 milésimos de segundo.\n");
+        extendedHelp[1].append("\n");
+        extendedHelp[1].append("                    1.5         - para atrasar 1 segundo e meio (1 segundo e 500 milésimos).\n");
+        extendedHelp[1].append("                    -31.8        - para adiantar 31,8 segundos (31 segundo e 800 milésimos).\n");
 		extendedHelp[1].append("\n");
 		extendedHelp[1].append("       [indiceLegenda]: (opcional) Legenda desde a qual se deseja alterar.\n");
 		extendedHelp[1].append("                        Todas as legendas seguintes sofrerao a mesma alteracao\n");
@@ -117,19 +116,9 @@ public class SyncroHelp {
 
 		//Tela 4:
 		extendedHelp[3].append("  \n");
-		extendedHelp[3].append("  - Este software e um PostCardWare!\n");
-		extendedHelp[3].append("    Se voce gostou dele, e este lhe foi util, mande um cartao postal para:\n");
+		extendedHelp[3].append("  - Este software e Freeware!\n");
+		extendedHelp[3].append("    Se voce gostou dele, e foi util, mande um e-mail agradecendo!\n");
 		extendedHelp[3].append("	\n");
-		extendedHelp[3].append("	------------------------------------------\n");
-		extendedHelp[3].append("	Gustavo Santos\n");
-		extendedHelp[3].append("	Rua Miguel de Frias, 164 apto 602\n");
-		extendedHelp[3].append("	Icarai - Niteroi / RJ\n");
-		extendedHelp[3].append("	CEP 24.220-003  BRAZIL\n");
-		extendedHelp[3].append("	------------------------------------------\n");
-		extendedHelp[3].append("	\n");
-		extendedHelp[3].append("	Cartoes postais de qualquer lugar serao bem vindos e colecionados!\n");
-		extendedHelp[3].append("	Não esqueca de adicionar o seu e-mail no cartao postal para que \n");
-		extendedHelp[3].append("	eu possa agradecer.\n");
 	}
 
 	public static void printBasicHelp() {

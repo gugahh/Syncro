@@ -2,6 +2,7 @@ package gustavo.syncro.test;
 
 import gustavo.syncro.exceptions.validacao.timestamp.TimestampInvalidoException;
 import gustavo.syncro.exceptions.validacao.timestamp.TimestampNuloException;
+import gustavo.syncro.utils.timeconverter.AbstractTimeConverter;
 import gustavo.syncro.utils.timeconverter.DataCompletaConverter;
 
 public class TestaDataCompletaConverter {
@@ -79,7 +80,7 @@ public class TestaDataCompletaConverter {
 
     public static void main(String[] args) throws TimestampNuloException, TimestampInvalidoException {
 
-        DataCompletaConverter dcc = new DataCompletaConverter();
+        AbstractTimeConverter dcc = new DataCompletaConverter();
 
         System.out.println(">> Testando isValidTimestamp - Mascara +00:00:59s");
         System.out.println("Testes positivos");

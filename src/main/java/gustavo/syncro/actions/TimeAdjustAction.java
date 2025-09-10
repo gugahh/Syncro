@@ -11,6 +11,7 @@ import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
 import gustavo.syncro.utils.timeconverter.AbstractTimeConverter;
 import gustavo.syncro.utils.timeconverter.DataCompletaConverter;
+import gustavo.syncro.utils.timeconverter.SegundoFracionadoConverter;
 
 import java.util.List;
 
@@ -198,10 +199,8 @@ public class TimeAdjustAction extends AbstractAction {
             throws TimestampNuloException, TimestampInvalidoException {
 
         final AbstractTimeConverter[] conversoresList = {
-                //TODO: aqui outros conversores serao espetados,
-                // para dar suporte a formatacoes de datas diferentes;
-                // Por hora, so temos este conversor aqui.
-                new DataCompletaConverter()
+                new DataCompletaConverter() ,
+                new SegundoFracionadoConverter()
         };
 
         for(AbstractTimeConverter timeConverter: conversoresList) {
