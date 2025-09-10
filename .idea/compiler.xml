@@ -9,8 +9,5 @@
         <module name="syncro" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="syncro" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

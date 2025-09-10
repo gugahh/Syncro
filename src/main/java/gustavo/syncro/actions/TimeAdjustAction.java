@@ -4,10 +4,13 @@ import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
+import gustavo.syncro.exceptions.validacao.timestamp.TimestampInvalidoException;
+import gustavo.syncro.exceptions.validacao.timestamp.TimestampNuloException;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
-import gustavo.syncro.utils.TimeConversionUtil;
+import gustavo.syncro.utils.timeconverter.AbstractTimeConverter;
+import gustavo.syncro.utils.timeconverter.DataCompletaConverter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +39,6 @@ public class TimeAdjustAction extends AbstractAction {
 
         TimeAdjustAction timeAdjustAction = TimeAdjustAction.getInstance();
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
-        TimeConversionUtil timeConversionUtil = TimeConversionUtil.getInstance();
 
         // Vai conter a lista das legendas, ja tratadas.
         List<Subtitle> listaLegendas = null;
@@ -102,16 +104,33 @@ public class TimeAdjustAction extends AbstractAction {
             //caso o Usu tenha informado um valor válido de em qual legenda iniciar, utilizá-lo.
             if(indiceLegendaInicial!= null) indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
 
+            //TODO: aqui outros conversores serao espetados,
+            // para dar suporte a formatacoes de datas diferentes;
+            // Por hora, so temos este conversor aqui.
+            AbstractTimeConverter timeConverter = new DataCompletaConverter();
+
+            int tempoEmMillis = 0;
+            boolean isFormatoAceito;
+
             try {
-                timeAdjustAction.modificaTempoTodasLegendas(listaLegendas,
-                        timeConversionUtil.getMillisFromUserString(args[2]),
-                        indicelegendaInt
-                );
+                isFormatoAceito = timeConverter.isAcceptedFormat(args[2]);
+                tempoEmMillis = timeConverter.getMillisFromString(args[2]);
+            } catch (TimestampNuloException | TimestampInvalidoException e) {
+                System.out.println(e.getMessage());
+                System.out.println(HelpUtil.howToGetHelpStr);
+                System.exit(-1);
+            }
+
+            // Efetivamente ajustando o tempo.
+            try {
+                timeAdjustAction.modificaTempoTodasLegendas(listaLegendas, tempoEmMillis,indicelegendaInt);
             } catch (PosicaoLegendaInvalidaException plie) {
                 plie.printStackTrace();
                 System.exit(-1);
             }
         } // if(args.length >= 3)
+
+        //TODO: Adicionar o Backup (se tudo deu certo, agora eh a hora de faze-lo).
 
         //Salva as alterações no arquivo de origem.
         // s.saveChangedSubtitleFile(args[1]);
@@ -144,10 +163,23 @@ public class TimeAdjustAction extends AbstractAction {
         }
 
         /* Testando o tempo de ajuste informado. */
+
+        //TODO: aqui outros conversores serao espetados,
+        // para dar suporte a formatacoes de datas diferentes;
+        // Por hora, so temos este conversor aqui.
+        AbstractTimeConverter timeConverter = new DataCompletaConverter();
+
+        int tempoEmMillis = 0;
+        boolean isFormatoAceito;
+
         try {
-            TimeConversionUtil.getInstance().getMillisFromUserString(tempoAjuste);
-        } catch(NumberFormatException e) {
-            return "\tErro: O tempo para ajuste da legenda informado nao e valido..";
+            isFormatoAceito = timeConverter.isAcceptedFormat(tempoAjuste);
+            tempoEmMillis = timeConverter.getMillisFromString(tempoAjuste);
+        } catch (TimestampNuloException | TimestampInvalidoException e) {
+            System.out.println("Erro: O tempo para ajuste da legenda informado nao e valido...");
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
         }
 
         /* Caso seja passado um valor de legenda inicial,
