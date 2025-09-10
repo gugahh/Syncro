@@ -12,19 +12,21 @@ import gustavo.syncro.utils.SubtitleUtil;
 import gustavo.syncro.utils.timeconverter.AbstractTimeConverter;
 import gustavo.syncro.utils.timeconverter.DataCompletaConverter;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TimeAdjustAction extends AbstractAction {
 
+    // Implementacao do Singleton.
     private static final TimeAdjustAction instance = new TimeAdjustAction();
 
-    private ArrayList<Subtitle> objetosLegenda1;
+    private TimeAdjustAction(){}
 
-    private static ArrayList<String> arquivoOriginal;
-    private ArrayList<Integer> posIndicesLegendas;
+    // private constructor to avoid client applications using the constructor
+    public static TimeAdjustAction getInstance() {
+        return instance;
+    }
 
+    //TODO: Resolver o backup de legenda.
     private boolean fazerBackupLegenda;
 
     /**
@@ -32,103 +34,99 @@ public class TimeAdjustAction extends AbstractAction {
      * todo o trabalho eh passado para esse classe; Validacoes e transformacoes
      * devem estar aqui, sendo que validacoes devem retornar excessoes.
      * args sao os argumentos da linha de comando (Main)
-     * @param args
+     *
+     * @param args argumentos da linha de comando.
      */
     @Override
     public void doAction(String[] args) {
 
-        TimeAdjustAction timeAdjustAction = TimeAdjustAction.getInstance();
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
         // Vai conter a lista das legendas, ja tratadas.
         List<Subtitle> listaLegendas = null;
 
-        if(args.length == 2){ //Usu informou arquivo, mas nao o tempo de ajuste
+        if(args.length <= 2){ //Usu informou arquivo, mas nao o tempo de ajuste
             System.out.println("\tO parametro tempo (de ajuste) e obrigatorio");
             System.out.println("\tpara realizar esta operacao.");
+            System.out.println("\tVerifique os parametros de entrada.");
             System.out.println(HelpUtil.howToGetHelpStr);
             System.exit(0);
         }
 
-        if(args.length >= 3) {
-            /* Nº de params e legal. Pode-se tentar comecar.
-             * No caso de qualquer método falhar a operação
-             * (execução da App) deve ser abortada. */
+        /* Nº de params e legal. Pode-se tentar comecar.
+         * No caso de qualquer método falhar a operação
+         * (execução da App) deve ser abortada. */
 
-            // args[0] args[1]   args[2]  args[3](opc)     args[3 ou 4] (opc)
-            //[-adjust [arquivo] [tempo] [indiceLegenda] ] [-nobak]
+        // args[0] args[1]   args[2]  args[3](opc)     args[3 ou 4] (opc)
+        //[-adjust [arquivo] [tempo] [indiceLegenda] ] [-nobak]
 
-            String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
+        String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
 
-            if(args.length >= 4){
-                //Args[3] pode ser um índice de legenda (opc) ou -nobak.
-                if(args[3].equalsIgnoreCase("-nobak") ||
-                        args[3].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
-                    fazerBackupLegenda = false;
-                    System.out.println("Fazer Backup - falta implementar");
-                } else indiceLegendaInicial = args[3];
-            }
+        if(args.length >= 4){
+            //Args[3] pode ser um índice de legenda (opc) ou -nobak.
+            if(args[3].equalsIgnoreCase("-nobak") ||
+                    args[3].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
+                fazerBackupLegenda = false;
+                System.out.println("Fazer Backup - falta implementar");
+            } else indiceLegendaInicial = args[3];
+        }
 
-            if(args.length == 5){ //O quarto parametro SÓ PODE ser referente ao Backup.
-                if(args[4].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
-                    fazerBackupLegenda = false;
-                    System.out.println("Fazer Backup - falta implementar");
-                } else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
-                    System.out.println("\tParametro invalido / desconhecido.");
-                    System.out.println(HelpUtil.howToGetHelpStr);
-                    System.exit(-1);
-                }
-            }
-
-            /* Nº de parâmetros passados e ordem é correta.
-             * Testando a consistência de cada um dos parâmetros. */
-            String msgTesteAjuste = timeAdjustAction.testaParamsEntradaAdjust(args[1], args[2], indiceLegendaInicial); //Caso passe, tudo Ok.
-            if (msgTesteAjuste != null) {
-                System.out.println(msgTesteAjuste);
+        if(args.length == 5){ //O quarto parametro SÓ PODE ser referente ao Backup.
+            if(args[4].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
+                fazerBackupLegenda = false;
+                System.out.println("Fazer Backup - falta implementar");
+            } else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
+                System.out.println("\tParametro invalido / desconhecido.");
                 System.out.println(HelpUtil.howToGetHelpStr);
                 System.exit(-1);
             }
+        }
 
-            try {
-                listaLegendas = sbtUtil.obtemListaLegendasFromFile(args[1]);
-            } catch (ValidacaoException e) {
-                throw new RuntimeException(e);
-            }
+        /* Nº de parâmetros passados e ordem é correta.
+         * Testando a consistência de cada um dos parâmetros. */
+        String msgTesteAjuste = this.testaParamsEntradaAdjust(args[1], args[2], indiceLegendaInicial); //Caso passe, tudo Ok.
+        if (msgTesteAjuste != null) {
+            System.out.println(msgTesteAjuste);
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
 
-            if (null == listaLegendas || listaLegendas.isEmpty()) {
-                throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
-            }
+        try {
+            listaLegendas = sbtUtil.obtemListaLegendasFromFile(args[1]);
+        } catch (ValidacaoException e) {
+            throw new RuntimeException(e);
+        }
 
-            //Efetua alterações de tempo solicitadas.
-            int indicelegendaInt = 1;
-            //caso o Usu tenha informado um valor válido de em qual legenda iniciar, utilizá-lo.
-            if(indiceLegendaInicial!= null) indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
+        if (null == listaLegendas || listaLegendas.isEmpty()) {
+            throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
+        }
 
-            //TODO: aqui outros conversores serao espetados,
-            // para dar suporte a formatacoes de datas diferentes;
-            // Por hora, so temos este conversor aqui.
-            AbstractTimeConverter timeConverter = new DataCompletaConverter();
+        //Efetua alterações de tempo solicitadas.
+        int indicelegendaInt = 1;
 
-            int tempoEmMillis = 0;
-            boolean isFormatoAceito;
+        //caso o Usu tenha informado um valor válido de em qual legenda iniciar, utilizá-lo.
+        if(indiceLegendaInicial!= null) {
+            indicelegendaInt = Integer.parseInt(indiceLegendaInicial);
+        }
 
-            try {
-                isFormatoAceito = timeConverter.isAcceptedFormat(args[2]);
-                tempoEmMillis = timeConverter.getMillisFromString(args[2]);
-            } catch (TimestampNuloException | TimestampInvalidoException e) {
-                System.out.println(e.getMessage());
-                System.out.println(HelpUtil.howToGetHelpStr);
-                System.exit(-1);
-            }
+        int tempoEmMillis = 0;
+        try {
+            AbstractTimeConverter timeConverter = getTimeConverter(args[2]);
+            tempoEmMillis = timeConverter.getMillisFromString(args[2]);
+        } catch (TimestampNuloException | TimestampInvalidoException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
 
-            // Efetivamente ajustando o tempo.
-            try {
-                timeAdjustAction.modificaTempoTodasLegendas(listaLegendas, tempoEmMillis,indicelegendaInt);
-            } catch (PosicaoLegendaInvalidaException plie) {
-                plie.printStackTrace();
-                System.exit(-1);
-            }
-        } // if(args.length >= 3)
+        // Efetivamente ajustando o tempo.
+        try {
+            this.modificaTempoTodasLegendas(listaLegendas, tempoEmMillis,indicelegendaInt);
+        } catch (PosicaoLegendaInvalidaException plie) {
+            System.out.println(plie.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
 
         //TODO: Adicionar o Backup (se tudo deu certo, agora eh a hora de faze-lo).
 
@@ -154,32 +152,22 @@ public class TimeAdjustAction extends AbstractAction {
      * @param indiceLegendaInicial indice da legenda inicial
      * @return o erro encontrado, ou null no caso de nao haver erros.
      */
-    public String testaParamsEntradaAdjust(String fileName, String tempoAjuste, String indiceLegendaInicial) {
+    public String testaParamsEntradaAdjust(String fileName,
+                                           String tempoAjuste,
+                                           String indiceLegendaInicial) {
 
         // Testando a consistência do arquivo de legenda enviado.
-        File arquivoLegenda = new File(fileName);
-        if(!arquivoLegenda.exists()){
+        if(!SubtitleFileUtil.fileExists(fileName)){
             return "\tErro: O arquivo solicitado nao existe.";
         }
 
-        /* Testando o tempo de ajuste informado. */
-
-        //TODO: aqui outros conversores serao espetados,
-        // para dar suporte a formatacoes de datas diferentes;
-        // Por hora, so temos este conversor aqui.
-        AbstractTimeConverter timeConverter = new DataCompletaConverter();
-
-        int tempoEmMillis = 0;
-        boolean isFormatoAceito;
-
+        /* Testando o tempo de ajuste informado;
+        *  obter um converter adequado significa que provavelmente a conversao
+        *  vai funcionar. */
         try {
-            isFormatoAceito = timeConverter.isAcceptedFormat(tempoAjuste);
-            tempoEmMillis = timeConverter.getMillisFromString(tempoAjuste);
+            AbstractTimeConverter timeConverter = getTimeConverter(tempoAjuste);
         } catch (TimestampNuloException | TimestampInvalidoException e) {
-            System.out.println("Erro: O tempo para ajuste da legenda informado nao e valido...");
-            System.out.println(e.getMessage());
-            System.out.println(HelpUtil.howToGetHelpStr);
-            System.exit(-1);
+            return (e.getMessage());
         }
 
         /* Caso seja passado um valor de legenda inicial,
@@ -199,12 +187,32 @@ public class TimeAdjustAction extends AbstractAction {
         return null; // Zero erros encontrados.
     }
 
-    // private constructor to avoid client applications using the constructor
-    public static TimeAdjustAction getInstance() {
-        return instance;
-    }
+    /**
+     * Obtem o conversor de tempo adequado, de acordo com o texto (com um timestamp)
+     * fornecido.
+     *
+     * @param umTimeStamp texto contendo um timestamp (ex: +00:00:02s)
+     * @return instancia de AbstractTimeConverter
+     */
+    AbstractTimeConverter getTimeConverter(String umTimeStamp)
+            throws TimestampNuloException, TimestampInvalidoException {
 
-    private TimeAdjustAction(){}
+        final AbstractTimeConverter[] conversoresList = {
+                //TODO: aqui outros conversores serao espetados,
+                // para dar suporte a formatacoes de datas diferentes;
+                // Por hora, so temos este conversor aqui.
+                new DataCompletaConverter()
+        };
+
+        for(AbstractTimeConverter timeConverter: conversoresList) {
+            if(timeConverter.isAcceptedFormat(umTimeStamp)) {
+                return timeConverter; // Obs: qualquer um dos conversores pode lancar TimestampNuloException.
+            }
+        }
+
+        // Se chegou aqui e nao achou um conversor valido... temos um problema.
+        throw new TimestampInvalidoException("O formato de data informado está errado, ou não é suportado");
+    }
 
     /* Usado para atrasar (ou adiantar) TODAS as legendas
      * pelo tempo definido como parâmetro;

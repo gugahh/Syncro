@@ -3,6 +3,7 @@ package gustavo.syncro.utils;
 import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,6 +14,15 @@ public class SubtitleFileUtil {
 
     public static final String ERRO_ESCRITA_LEGENDAS = "Erro ao escrever o arquivo de legendas %s";
 
+    /**
+     * Salva um arquivo de legendas, a partir da lista
+     * de legendas ja modificada.
+     * Sobrescreve o arquivo existente, se existir.
+     *
+     * @param fileName nome do arquivo
+     * @param legendasList lista de legendas para persistir.
+     * @throws ArquivoLegendaWriteException caso ocorre qualquer erro.
+     */
     public static void saveChangedSubtitleFile(
             String fileName, List<Subtitle> legendasList) throws ArquivoLegendaWriteException {
         PrintWriter writer = null;
@@ -38,5 +48,15 @@ public class SubtitleFileUtil {
                 writer.close();
             }
         }
+    }
+
+    /**
+     * Verifica se um arquivo existe no sistema de arquivos.
+     * @param filename nome do arquivo a ser testado
+     * @return boolean
+     */
+    public static boolean fileExists(String filename) {
+        File umArquivo = new File(filename);
+        return umArquivo.exists();
     }
 }
