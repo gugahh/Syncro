@@ -6,23 +6,31 @@ import gustavo.syncro.exceptions.validacao.timestamp.TimestampNuloException;
 import java.util.regex.Pattern;
 
 /**
- * Converte datas o formato +00:00:01s / -00:00:01s para milisegundos.
+ * Converte datas no formato (+00:00:01s / -00:00:01s) para milisegundos;
+ * Tambem aceita os formato +00:01s, 00:01s, +01s, 01s, +1s e 1s.
  */
 public class DataCompletaConverter extends AbstractTimeConverter {
 
-    final Pattern DATE_PATTERN;
+    // Pattern +00:00:01s e 00:00:01s
+    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?\\d{2}:\\d{2}:\\d{2}[sS]$");
 
-    final String MSM_MASCARA_INVALIDA = "O tempo de ajuste informado não esta na máscara +00:00:01s.";
+    // Patterns +00:01s e 00:01s
+    final Pattern DATE_PATTERN_2 = Pattern.compile( "^[+-]?\\d{2}:\\d{2}[sS]$");
 
-    public DataCompletaConverter() {
-        DATE_PATTERN = Pattern.compile( "^[+-]\\d{2}:\\d{2}:\\d{2}[sS]$");
-    }
+    // Pattern +01s, +1s e 1s
+    final Pattern DATE_PATTERN_3 = Pattern.compile( "^[+-]?[0-9]{1,2}[sS]$");
+
+    final String MSM_MASCARA_INVALIDA = "O tempo de ajuste informado não esta nas máscaras +00:00:01s, +00:01s, ou +01s";
 
     @Override
     public boolean isAcceptedFormat(String txtCandidate) throws TimestampNuloException {
 
         validaTimeStampNulo(txtCandidate); // Lanca TimestampNuloException
-        return DATE_PATTERN.matcher(txtCandidate).matches();
+
+        // Essa classe trabalha com essas 3 mascaras:
+        return DATE_PATTERN_1.matcher(txtCandidate).matches() ||
+                DATE_PATTERN_2.matcher(txtCandidate).matches() ||
+                DATE_PATTERN_3.matcher(txtCandidate).matches();
     }
 
     @Override
@@ -31,7 +39,8 @@ public class DataCompletaConverter extends AbstractTimeConverter {
 
         validaTimeStampNulo(txtSequence);   // lanca TimestampNuloException
 
-        // Quem chama esse metodo tem que garantir que o texto esta na mascara +00:00:01s
+        // Quem chama esse metodo tem que garantir que o texto usa as mascaras aceitas.
+        // Esse erro nao deveria acontecer (erro de programacao).
         if (!this.isAcceptedFormat(txtSequence)) {
             throw new TimestampInvalidoException(MSM_MASCARA_INVALIDA);
         }
