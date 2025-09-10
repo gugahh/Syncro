@@ -50,7 +50,10 @@ public class SegundoFracionadoConverter extends AbstractTimeConverter {
         if (Integer.parseInt(pedacos[0]) != 0) {
             millis += Integer.parseInt(pedacos[0]) * 1000; // Evitando multiplicacao por zero, né
         }
-        millis += Integer.parseInt(pedacos[1]);
+
+        if (Integer.parseInt(pedacos[1]) != 0) {
+            millis += Integer.parseInt(pedacos[1]) * 100; // Evitando multiplicacao por zero
+        }
 
         return millis * intSinal;
     }
