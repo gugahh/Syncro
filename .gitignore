@@ -35,7 +35,6 @@ target/
 #Outros
 *.old
 
-#Backups de Legendas
 Backup_*.srt
 
 ./idea/sonarlint/
@@ -44,3 +43,7 @@ Backup_*.srt
 Syncro.iml
 syncro.iml
 *.iml
+
+.idea/sonarlint/
+.idea/jpa-buddy.xml
+
