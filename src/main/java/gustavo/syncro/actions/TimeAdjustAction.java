@@ -17,6 +17,10 @@ import gustavo.syncro.utils.timeconverter.SegundoFracionadoConverter;
 
 import java.util.List;
 
+/**
+ * Action utilizada para ajustar o tempo de todas (ou de algumas)
+ * legendas em um arquivo, adiantando ou atrasando-as.
+ */
 public class TimeAdjustAction extends AbstractAction {
 
     // Implementacao do Singleton.
@@ -24,12 +28,9 @@ public class TimeAdjustAction extends AbstractAction {
 
     private TimeAdjustAction(){}
 
-    // private constructor to avoid client applications using the constructor
     public static TimeAdjustAction getInstance() {
         return instance;
     }
-
-    private boolean fazerBackupLegenda;
 
     /**
      * Uma vez entendido que a acao a ser realizada eh o ajuste de tempo de legendas,
@@ -42,8 +43,7 @@ public class TimeAdjustAction extends AbstractAction {
     @Override
     public void doAction(String[] args) {
 
-        //Cleanup
-        fazerBackupLegenda = true;
+        boolean fazerBackupLegenda = true; // O padrao eh fazer backup.
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -226,15 +226,14 @@ public class TimeAdjustAction extends AbstractAction {
         throw new TimestampInvalidoException("O formato de data informado está errado, ou não é suportado");
     }
 
-    /* Usado para atrasar (ou adiantar) TODAS as legendas
-     * pelo tempo definido como parâmetro;
-     * Params:
-     * - Lista contendo as legendas que se deseja ajustar.
-     * - tempo desejado de ajuste (milisegundos)
-     * - id da legenda a partir da qual fazer a alteração
-     * modifytime
-     * 			 */
-
+    /**
+     * Usado para atrasar (ou adiantar) TODAS as legendas pelo tempo definido como parâmetro
+     *
+     * @param objetosLegenda - Lista contendo as legendas que se deseja ajustar.
+     * @param timeInMilis - tempo desejado de ajuste (milisegundos)
+     * @param indice - id da legenda a partir da qual fazer a alteração
+     * @throws PosicaoLegendaInvalidaException
+     */
     public void modificaTempoTodasLegendas(
             List<Subtitle> objetosLegenda ,
             int timeInMilis,

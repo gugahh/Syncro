@@ -4,19 +4,19 @@ Backlog do Projeto Syncro
    quando o "timestamp" de uma legenda não corresponde a uma marcação de tempo
    (exemplo: monk.srt). (OK)
 
-1.1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado.
+1.1. Permitir o formato de "data" em segundos (ex: +1s / -3s), que nunca foi implementado. (OK em 11/09/25)
 
-2. Permitir que o formato em segundos tenha valores fracionários (ex: +3,5s).
+2. Permitir que o formato em segundos tenha valores fracionários (ex: +3,5s). (OK em 11/09/25)
 
 2.1 Criar testes unitarios para a classe SubtitleUtil
 
-3. Criar validadores (classes específicas) para os formatos de ajuste (+00:00:01s / +01s).
+3. Criar validadores (classes específicas) para os formatos de ajuste (+00:00:01s / +01s). (OK em 11/09/25)
 
-4. Refatorar o codigo para facilitar "instalar" novos modos
-    - cada modo deve ter seu proprio arquivo independente de rotinas.
-    - cada modo deve possuir seu proprio arquivo de help
-    - Uma classe principal escolhe entre um modo ou outro, e repassa os parametros.
-    - As rotinas de cado modo incluem validação de seus parâmetros.
+4. Refatorar o codigo para facilitar "instalar" novos modos (OK em 11/09/25)
+    - cada modo deve ter seu proprio arquivo independente de rotinas. (OK em 11/09/25)
+    - cada modo deve possuir seu proprio arquivo de help (adiado)
+    - Uma classe principal escolhe entre um modo ou outro, e repassa os parametros. (OK em 11/09/25)
+    - As rotinas de cado modo incluem validação de seus parâmetros. (OK em 11/09/25)
 
 5. Criar o modo "copyCat":
     - param: legenda de exemplo
@@ -38,3 +38,11 @@ Backlog do Projeto Syncro
     - Todas as legendas entre a legenda 15 e a 39 serão ajustadas proporcionalmente,
       recebendo a última (a 39), 100% do ajuste de tempo, e a primeira (a 15), 0% de ajuste.
     - Legendas após a legenda de término (ex: 40 em diante), todas receberão 100% de ajuste.
+
+8. Criar o modo "split", para quebrar uma legenda em N outras, de modo a facilitar (OK em 11/09/25)
+   a traducao dos pedacoes utilizando uma IA gratuita.
+   Ex: monk.srt  ---> ( monk_001.srt, monk_002.srt, monk_003.srt )
+
+8. Criar o modo "merge", para reunir diversas legendas em uma, util
+   para o caso de traducao via IA.
+   Ex: ( monk_001.srt, monk_002.srt, monk_003.srt ) --> monk.srt

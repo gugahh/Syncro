@@ -1,8 +1,9 @@
 package gustavo.syncro;
 
 import gustavo.syncro.actions.RenumerarAction;
-import gustavo.syncro.utils.*;
 import gustavo.syncro.actions.TimeAdjustAction;
+import gustavo.syncro.actions.SplitAction;
+import gustavo.syncro.utils.*;
 
 import java.io.*;
 
@@ -12,13 +13,13 @@ public class SyncroApp {
 
 	private static final RenumerarAction renumerarAction = RenumerarAction.getInstance();
 
+    private static final SplitAction splitAction = SplitAction.getInstance();
+
+
 	public SyncroApp(){
 	}
 
 	public static void main(String[] args) throws IOException {
-
-        // TODO: tratar o Backup.
-        boolean fazerBackupLegenda = true;
 
 		if(args.length == 0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
@@ -54,6 +55,10 @@ public class SyncroApp {
             case "-RENUM" :
                 renumerarAction.doAction(args);
                 break;
+            case "-SPLIT" :
+                splitAction.doAction(args);
+                break;
+
             default:
                 System.out.println("Parametro Invalido.");
                 System.out.println(HelpUtil.howToGetHelpStr);

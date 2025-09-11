@@ -11,7 +11,6 @@ import gustavo.syncro.utils.SubtitleUtil;
 
 import java.io.File;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Classe responsavel por tudo o que for exclusivo a Renumerar Legendas
@@ -21,9 +20,6 @@ public class RenumerarAction extends AbstractAction {
     /* implementacao do singleton */
     private static final RenumerarAction instance = new RenumerarAction();
 
-    private boolean fazerBackupLegenda;
-
-    // private constructor to avoid client applications using the constructor
     private RenumerarAction(){}
 
     public static RenumerarAction getInstance() {
@@ -34,7 +30,7 @@ public class RenumerarAction extends AbstractAction {
     public void doAction(String[] args) {
 
         //Cleanup
-        fazerBackupLegenda = true;
+        boolean fazerBackupLegenda = true;
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -113,7 +109,6 @@ public class RenumerarAction extends AbstractAction {
         }
 
         System.out.println("\nO Índice das Legendas foi ajustado com SUCESSO.");
-
     }
 
     /**
@@ -123,7 +118,7 @@ public class RenumerarAction extends AbstractAction {
      * @param fileName nome do arquivo de legenda
      * @param indiceLegendaInic indice original da legenda inicial
      * @param indiceLegendaDesejada indice que se deseja para a legenda inicial informada
-     * @return
+     * @return o tipo de erro encontrado.
      */
     public String testaParamsEntradaRenum(String fileName,
                                         String indiceLegendaInic,
