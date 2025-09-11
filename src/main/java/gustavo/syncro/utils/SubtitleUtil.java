@@ -1,5 +1,12 @@
 package gustavo.syncro.utils;
 
+import gustavo.syncro.Subtitle;
+import gustavo.syncro.exceptions.FileReadException;
+import gustavo.syncro.exceptions.validacao.ValidacaoException;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,7 +30,7 @@ public class SubtitleUtil {
         return instance;
     }
 
-    /**
+        /**
      * Verifica se uma linha (de texto) é uma linha de timeStamps.
      * Formato: "00:00:01,520 --> 00:00:03,541"
      * @param linha a ser validada
@@ -88,6 +95,142 @@ public class SubtitleUtil {
         out.append(String.format("%03d", milis));
 
         return out.toString();
+    }
+
+    /**
+     * TODO:Esse deve ser o unico metodo publico da classe.
+     * Recebe o NOME de um arquivo, e retorna uma lista de legendas a
+     * partir deste. Havendo erros, retorna como excessoes.
+     * @return lista de legendas
+     */
+    public List<Subtitle> obtemListaLegendasFromFile(String fileName)
+            throws ValidacaoException, RuntimeException {
+
+        List<String> arquivoOriginal = new ArrayList<>();
+
+        // Lista com cada uma das linhas do arquivo original, como texto.
+        // Guarda as posicoes das Legendas (nos de linha) no texto original.
+        List<Integer> posIndicesLegendas;
+
+        // Lista com as Legendas, perfeitamente tratadas.
+        List<Subtitle> objetosLegenda1;
+
+        /* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
+         * Este método também cria uma cópia backup do arquivo de legenda. */
+
+
+        try {
+            arquivoOriginal = FileReaderUtil.readFromFile(fileName);
+        } catch (FileReadException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        /* 2ª Iteração:
+         * Descobre quais das linhas obtidas representam um índice (de legenda).
+         * Um índice deve vir SEMPRE imediatamente seguido de uma linha de timestamps, e
+         * deve ser logicamente numérico. Satisfeitas estas condições, armazena-se a posição
+         * (Nº de linha) que contém o índice). */
+        posIndicesLegendas =  localizaIndicesLegendas(arquivoOriginal);
+
+        /* 3ª iteração:
+         * Cria um array de objetos Subtitle;
+         * Já testamos e sabemos quais linhas contém um índice, e quais
+         * linhas contém timestamps válidos. */
+        objetosLegenda1 = criaArraySubtitles(arquivoOriginal, posIndicesLegendas);
+
+        // TODO: Finalizar.
+        return objetosLegenda1;
+    }
+
+    /* 2ª Iteração:
+     * Descobre quais das linhas obtidas representam um índice (de legenda).
+     * Um índice deve vir SEMPRE imediatamente seguido de uma linha de timestamps, e
+     * deve ser logicamente numérico. Satisfeitas estas condições, armazena-se a posição
+     * (Nº de linha) que contém o índice). */
+    private List<Integer> localizaIndicesLegendas(List<String> arquivoOriginal){
+        // System.out.println(">> Entrou em localizaIndicesLegendas");
+
+        List<Integer> posIndicesLegendas = new ArrayList<>();
+
+        // if(arquivoOriginal.size() < 2) return; //nada a fazer
+
+        String linhaAtual;
+        for(int idx=1; idx < arquivoOriginal.size(); idx++){
+
+            /* Procurando linhas com timestamps:
+             * Estas deverão ter o formato "00:00:01,520 --> 00:00:03,541" */
+            linhaAtual = arquivoOriginal.get(idx);
+
+            if(linhaAtual.trim().isEmpty()) continue; // Linha em branco, ignorar.
+
+            if(linhaAtual.length() == 29 && this.isFormatoLinhaTimeStamp(linhaAtual)) {
+                //Linha atual é uma linha de timestamps.
+                //Linha anterior, então, DEVERIA ser uma linha de índices.
+                try {
+                    Integer.parseInt( arquivoOriginal.get(idx-1) );
+                    // Se uma excessão NÃO foi lançada, bloco id + tempo é correto.
+                    //Adicionar a linha de índice ao array de posições.
+                    posIndicesLegendas.add(idx - 1);
+                    //System.out.println("Achou: " + arquivoOriginal.get(idx-1));
+                } catch( NumberFormatException e){
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // System.out.println("<< Saiu de localizaIndicesLegendas");
+        return posIndicesLegendas;
+    }
+
+    /* 3ª iteração:
+     * Cria um array de objetos Subtitle;
+     * Já testamos e sabemos quais linhas contém um índice, e quais
+     * linhas contém timestamps válidos. */
+    List<Subtitle> criaArraySubtitles(List<String> arquivoOriginal, List<Integer> posIndicesLegendas) {
+
+        List<Subtitle> objetosLegenda1 = new ArrayList<Subtitle>();
+
+        // System.out.println(">> Entrou em criaArraySubtitles");
+
+        // System.out.println("posIndicesLegendas.size(): " + posIndicesLegendas.size());
+
+        for(int idx=0; idx < posIndicesLegendas.size(); idx++) {
+
+            // System.out.println("Processando idx :" + String.valueOf(idx));
+
+            int indiceLegenda	= Integer.parseInt(arquivoOriginal.get( posIndicesLegendas.get(idx) ));
+            String startTime	= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(0, 12);
+            String endTime		= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(17, 29);
+
+            Subtitle sub = new Subtitle(indiceLegenda, startTime, endTime);
+            objetosLegenda1.add(sub);
+
+            /*	Para se obter o texto da legenda, há que se obter a posição de início do próximo item legenda;
+             * Caso se esteja processando a última legenda, pegar linhas até o fim do arrayList. */
+            int posicaoFinal;
+            if(idx < (posIndicesLegendas.size() -1)){ //Legenda NÃO é a última
+                posicaoFinal = posIndicesLegendas.get(idx+1); //Nº de linha onde inicia a próxima legenda.
+            }
+            else posicaoFinal = arquivoOriginal.size();
+
+            //Adicionando todas as linhas (texto das legendas) entre uma legenda e outra.
+            String tempString;
+            for(int g=posIndicesLegendas.get(idx)+2; g < posicaoFinal; g++) {
+                tempString = arquivoOriginal.get( g );
+                if(g>posIndicesLegendas.get(idx)+2){
+                    sub.appendTexto("\r\n"); //linhas posteriores à primeira merecem um Newline antes...
+                }
+                sub.appendTexto( tempString );
+            }
+        }
+        // printAllSubtitleObjects(); // Usado para Debugar.
+        // System.out.println("<< Saiu de criaArraySubtitles");
+
+        return objetosLegenda1;
     }
 
 }
