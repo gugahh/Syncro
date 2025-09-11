@@ -6,7 +6,14 @@ import java.io.InputStreamReader;
 public class SyncroHelp {
 
 	private static final StringBuilder basicHelp = new StringBuilder();
-	private static final StringBuilder[] extendedHelp = new StringBuilder[5];
+	private static final StringBuilder[] extendedHelp =
+        {
+            new StringBuilder(),    // extendedHelp[0]
+            new StringBuilder(),    // extendedHelp[1]
+            new StringBuilder(),    // extendedHelp[2]
+            new StringBuilder(),    // extendedHelp[3]
+            new StringBuilder()     // extendedHelp[4]
+        };
 
 	static {
 
@@ -38,12 +45,6 @@ public class SyncroHelp {
         basicHelp.append("             indice da legenda novo (desejado) sao obrigatorios \n");
         basicHelp.append("\n");
 		basicHelp.append("  [-nobak]: Opcional. Usar quando nao desejar criar um arquivo de backup.\n");
-
-		extendedHelp[0] = new StringBuilder();
-		extendedHelp[1] = new StringBuilder();
-		extendedHelp[2] = new StringBuilder();
-		extendedHelp[3] = new StringBuilder();
-        extendedHelp[4] = new StringBuilder();
 
 		//Tela 1:
 		extendedHelp[0].append("\n");
