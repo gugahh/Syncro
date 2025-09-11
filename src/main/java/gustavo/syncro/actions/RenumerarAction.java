@@ -51,7 +51,7 @@ public class RenumerarAction extends AbstractAction {
 
         if (args.length == 5) {
             //Args[4] só pode ser -nobak.
-            if (args[4].equalsIgnoreCase("-nobak")) { //Usu solicitou não fazer backup
+            if (args[4].equalsIgnoreCase("-nobak") || args[4].equalsIgnoreCase("-noback")) { //Usu solicitou não fazer backup
                 fazerBackupLegenda = false;
                 System.out.println("Fazer Backup - falta implementar");
             } else {
