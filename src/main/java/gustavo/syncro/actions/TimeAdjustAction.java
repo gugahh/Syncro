@@ -72,7 +72,6 @@ public class TimeAdjustAction extends AbstractAction {
             if(args[3].equalsIgnoreCase("-nobak") ||
                     args[3].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
                 fazerBackupLegenda = false;
-                System.out.println("Fazer Backup - falta implementar");
             } else indiceLegendaInicial = args[3];
         }
 
@@ -80,7 +79,6 @@ public class TimeAdjustAction extends AbstractAction {
             if(args[4].equalsIgnoreCase("-nobak") ||
                     args[4].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
                 fazerBackupLegenda = false;
-                System.out.println("Fazer Backup - falta implementar");
             } else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
                 System.out.println("\tParametro invalido / desconhecido.");
                 System.out.println(HelpUtil.howToGetHelpStr);

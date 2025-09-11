@@ -40,3 +40,7 @@ Backup_*.srt
 
 ./idea/sonarlint/
 .idea/
+
+Syncro.iml
+syncro.iml
+*.iml
