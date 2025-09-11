@@ -11,14 +11,15 @@ import java.util.regex.Pattern;
  */
 public class DataCompletaConverter extends AbstractTimeConverter {
 
+    // "^[+-]?[0-5]?[0-9].[0-9]s$"
     // Pattern +00:00:01s e 00:00:01s
-    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?\\d{2}:\\d{2}:\\d{2}[sS]$");
+    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?\\d{2}:[0-5][0-9]:[0-5][0-9][sS]$");
 
     // Patterns +00:01s e 00:01s
-    final Pattern DATE_PATTERN_2 = Pattern.compile( "^[+-]?\\d{2}:\\d{2}[sS]$");
+    final Pattern DATE_PATTERN_2 = Pattern.compile( "^[+-]?[0-5][0-9]:[0-5][0-9][sS]$");
 
     // Pattern +01s, +1s e 1s
-    final Pattern DATE_PATTERN_3 = Pattern.compile( "^[+-]?[0-9]{1,2}[sS]$");
+    final Pattern DATE_PATTERN_3 = Pattern.compile( "^[+-]?[0-5]?[0-9][sS]$");
 
     final String MSG_MASCARA_INVALIDA = "O tempo de ajuste informado não esta nas máscaras +00:00:01s, +00:01s, ou +01s";
 

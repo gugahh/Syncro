@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 public class SegundoFracionadoConverter extends AbstractTimeConverter {
 
     // Pattern +59.1 ou 59.2 (o sinal eh opcional).
-    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?[0-5]?[0-9].[0-9]$");
+    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?[0-5]?[0-9].[0-9]s$");
 
     final String MSG_MASCARA_INVALIDA = "O tempo de ajuste informado não esta na máscaras +00.5s ou 1.5s";
 
@@ -43,6 +43,8 @@ public class SegundoFracionadoConverter extends AbstractTimeConverter {
             }
             txtSequence = txtSequence.substring(1); //Excluindo o sinal da String
         }
+
+        txtSequence=txtSequence.substring(0, txtSequence.length()-1); //Excluindo o "S", de segundos.
 
         /* nesta notação, a parte inteira e a fracionaria sao divididas por um ponto. */
         String[] pedacos = txtSequence.split("\\.");

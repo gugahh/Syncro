@@ -53,7 +53,7 @@ public class SyncroHelp {
 		extendedHelp[0].append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
 		extendedHelp[0].append("  arquivo de legendas *.srt.\n");
 		extendedHelp[0].append("- Este software e Freeware. Se gostar, mande-me um\n");
-		extendedHelp[0].append("  cartao postal agradecendo (use a opcao -help para detalhes).\n");
+		extendedHelp[0].append("  e-mail agradecendo (use a opcao -help para detalhes).\n");
 		extendedHelp[0].append("\n");
 		extendedHelp[0].append("Utilizacao:\n");
 		extendedHelp[0].append("-----------\n");
@@ -82,8 +82,8 @@ public class SyncroHelp {
 		extendedHelp[1].append("                   +01:10s     - para atrasar 1 minuto e dez segundos\n");
 		extendedHelp[1].append("                                 (o sinal positivo e opcional);\n");
         extendedHelp[1].append("\n");
-        extendedHelp[1].append("                    1.5         - para atrasar 1 segundo e meio (1 segundo e 500 milésimos).\n");
-        extendedHelp[1].append("                    -31.8        - para adiantar 31,8 segundos (31 segundo e 800 milésimos).\n");
+        extendedHelp[1].append("                    1.5s       - para atrasar 1 segundo e meio (1 segundo e 500 milésimos).\n");
+        extendedHelp[1].append("                    -31.8s     - para adiantar 31,8 segundos (31 segundo e 800 milésimos).\n");
 		extendedHelp[1].append("\n");
 		extendedHelp[1].append("       [indiceLegenda]: (opcional) Legenda desde a qual se deseja alterar.\n");
 		extendedHelp[1].append("                        Todas as legendas seguintes sofrerao a mesma alteracao\n");

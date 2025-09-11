@@ -9,27 +9,28 @@ public class testaSegundoFracionadoConverter {
 
     // Positivos - Mascara +59s, +1s ou 15s
     static String[] testesPositivos_bloco1 = {
-            "-01.0",
-            "+59.1",
-            "+00.9",
-            "-00.0",
-            "+00.0",
-            "13.3",
-            "-09.5",
-            "-1.4"
+            "-01.0s",
+            "+1.1s",
+            "+59.1s",
+            "+00.9s",
+            "-00.0s",
+            "+00.0s",
+            "13.3s",
+            "-09.5s",
+            "-1.4s"
     };
 
     // Negativos - Mascara +59s, +1s ou 15s
     static String[] testesNegativos_bloco1 = {
             "-01",
-            "-01.8s",
-            "01.8s",
-            "-ef",
-            "+ix",
-            "-e",
-            "+00.x",
-            "+xx.9",
-            "60.5",     //Tempo maximo eh 59.9s
+            "-01.8",
+            "01.8",
+            "-efs",
+            "+ixs",
+            "-e0s",
+            "+00.xs",
+            "+xx.9s",
+            "60.5s",     //Tempo maximo eh 59.9s
             ""
     };
     public static void main(String[] args) throws TimestampNuloException, TimestampInvalidoException {
