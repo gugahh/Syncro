@@ -12,11 +12,11 @@ import java.util.regex.Pattern;
 public class DataCompletaConverter extends AbstractTimeConverter {
 
     // "^[+-]?[0-5]?[0-9].[0-9]s$"
-    // Pattern +00:00:01s e 00:00:01s
-    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?\\d{2}:[0-5][0-9]:[0-5][0-9][sS]$");
+    // Pattern +00:00:01s, 00:00:01s, 1:20:35s, -2:12:33s
+    final Pattern DATE_PATTERN_1 = Pattern.compile( "^[+-]?[0-5]?[0-9]:[0-5][0-9]:[0-5][0-9][sS]$");
 
-    // Patterns +00:01s e 00:01s
-    final Pattern DATE_PATTERN_2 = Pattern.compile( "^[+-]?[0-5][0-9]:[0-5][0-9][sS]$");
+    // Patterns +00:01s, 00:01s +1:02s, -2.20s
+    final Pattern DATE_PATTERN_2 = Pattern.compile( "^[+-]?[0-5]?[0-9]:[0-5][0-9][sS]$");
 
     // Pattern +01s, +1s e 1s
     final Pattern DATE_PATTERN_3 = Pattern.compile( "^[+-]?[0-5]?[0-9][sS]$");

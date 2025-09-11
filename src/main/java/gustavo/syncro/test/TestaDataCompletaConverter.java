@@ -7,7 +7,7 @@ import gustavo.syncro.utils.timeconverter.DataCompletaConverter;
 
 public class TestaDataCompletaConverter {
 
-    // Mascara +00:00:59s
+    // Mascara +00:00:59s, +1:22:40s
     static String[] testesPositivos_bloco1 = {
             "-00:00:01s",
             "+00:00:59s",
@@ -16,7 +16,9 @@ public class TestaDataCompletaConverter {
             "+10:20:35s",
             "-10:20:35s",
             "+13:59:10S",   // Segundos em caixa alta! Eh permitido.
-            "00:59:10s"     // Eh permitido omitir o sinal.
+            "00:59:10s",     // Eh permitido omitir o sinal.
+            "+1:22:13s",     // / Eh permitido omitir a dezena da hora
+            "1:22:13s"     // / Eh permitido omitir a dezena da hora e o sinal.
     };
 
     // Mascara +00:00:59s
@@ -30,7 +32,7 @@ public class TestaDataCompletaConverter {
             "+00000159s"
     };
 
-    // Positivos - Mascara +00:59s
+    // Positivos - Mascara +00:59s, -1:15s, 3:40s
     static String[] testesPositivos_bloco2 = {
             "-00:01s",
             "+00:59s",
@@ -39,7 +41,9 @@ public class TestaDataCompletaConverter {
             "+20:35s",
             "-20:35s",
             "+59:10S",    // Segundos em caixa alta! Eh permitido.
-            "59:10s"      // Eh permitido omitir o sinal.
+            "59:10s",      // Eh permitido omitir o sinal.
+            "-9:10s",      // Eh permitido omitir a dezena do minuto
+            "9:10s"      // Eh permitido omitir a dezena do minuto e o sinal.
     };
 
     // Negativos - Mascara +00:59s
@@ -52,7 +56,8 @@ public class TestaDataCompletaConverter {
             "+00/59s",
             "+00-59s",
             "+00059s",
-            "+0159s"
+            "+0159s",
+            "+159s"
     };
 
     // Positivos - Mascara +59s, +1s ou 15s
@@ -62,9 +67,9 @@ public class TestaDataCompletaConverter {
             "+00s",
             "-00s",
             "+1s",
-            "-2s",
-            "1s",
-            "59s",
+            "-2s",  //omitindo dezena do segundo
+            "59s",  //omitindo o sinal
+            "9s"   //omitindo dezena do segundo e o sinal
     };
 
     // Negativos - Mascara +59s, +1s ou 15s
@@ -73,6 +78,8 @@ public class TestaDataCompletaConverter {
             "-ef",
             "+ix",
             "-e",
+            "=59s",
+            "+60s", //60s nao eh permitido. Usar +1:00s
             "+500s",
             "+1000s",
             ""

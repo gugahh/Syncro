@@ -2,7 +2,9 @@ package gustavo.syncro.actions;
 
 import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
+import gustavo.syncro.exceptions.validacao.FileBackupException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
+import gustavo.syncro.utils.BackupFileUtil;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
@@ -30,6 +32,9 @@ public class RenumerarAction extends AbstractAction {
 
     @Override
     public void doAction(String[] args) {
+
+        //Cleanup
+        fazerBackupLegenda = true;
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -86,8 +91,20 @@ public class RenumerarAction extends AbstractAction {
 
         this.modifyIndiceLegendas(listaLegendas, args[2], args[3]);
 
+        //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
+        if(fazerBackupLegenda) {
+            BackupFileUtil bfu = new BackupFileUtil();
+            try {
+                System.out.println("Gerando um backup do arquivo de legenda original...");
+                String nomeNovoArquivo = bfu.makeBackupFromFile(args[1]);
+                System.out.println("\tNome do arquivo (backup) gerado: " + nomeNovoArquivo);
+            } catch (FileBackupException e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        }
+
         //Salva as alterações no arquivo de origem.
-        // s.saveChangedSubtitleFile(args[1]);
         try {
             SubtitleFileUtil.saveChangedSubtitleFile(args[1], listaLegendas);
         } catch (ArquivoLegendaWriteException e) {
@@ -96,7 +113,7 @@ public class RenumerarAction extends AbstractAction {
             System.exit(-1);
         }
 
-        System.out.println("O Índice das Legendas foi ajustado com sucesso.");
+        System.out.println("\nO Índice das Legendas foi ajustado com SUCESSO.");
 
     }
 

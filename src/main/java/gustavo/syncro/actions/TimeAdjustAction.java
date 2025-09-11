@@ -3,9 +3,11 @@ package gustavo.syncro.actions;
 import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 import gustavo.syncro.exceptions.PosicaoLegendaInvalidaException;
+import gustavo.syncro.exceptions.validacao.FileBackupException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
 import gustavo.syncro.exceptions.validacao.timestamp.TimestampInvalidoException;
 import gustavo.syncro.exceptions.validacao.timestamp.TimestampNuloException;
+import gustavo.syncro.utils.BackupFileUtil;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
@@ -27,7 +29,6 @@ public class TimeAdjustAction extends AbstractAction {
         return instance;
     }
 
-    //TODO: Resolver o backup de legenda.
     private boolean fazerBackupLegenda;
 
     /**
@@ -40,6 +41,9 @@ public class TimeAdjustAction extends AbstractAction {
      */
     @Override
     public void doAction(String[] args) {
+
+        //Cleanup
+        fazerBackupLegenda = true;
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -72,8 +76,9 @@ public class TimeAdjustAction extends AbstractAction {
             } else indiceLegendaInicial = args[3];
         }
 
-        if(args.length == 5){ //O quarto parametro SÓ PODE ser referente ao Backup.
-            if(args[4].equalsIgnoreCase("-nobak")){ //Usu solicitou não fazer backup
+        if(args.length == 5){ //O quarto parametro so pode ser referente ao Backup.
+            if(args[4].equalsIgnoreCase("-nobak") ||
+                    args[4].equalsIgnoreCase("-noback")){ //Usu solicitou não fazer backup
                 fazerBackupLegenda = false;
                 System.out.println("Fazer Backup - falta implementar");
             } else { //Parâmetro inválido (deveria ser -nobak, ou não existir).
@@ -129,10 +134,20 @@ public class TimeAdjustAction extends AbstractAction {
             System.exit(-1);
         }
 
-        //TODO: Adicionar o Backup (se tudo deu certo, agora eh a hora de faze-lo).
+        //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
+        if(fazerBackupLegenda) {
+            BackupFileUtil bfu = new BackupFileUtil();
+            try {
+                System.out.println("Gerando um backup do arquivo de legenda original...");
+                String nomeNovoArquivo = bfu.makeBackupFromFile(args[1]);
+                System.out.println("\tNome do arquivo (backup) gerado: " + nomeNovoArquivo);
+            } catch (FileBackupException e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        }
 
         //Salva as alterações no arquivo de origem.
-        // s.saveChangedSubtitleFile(args[1]);
         try {
             SubtitleFileUtil.saveChangedSubtitleFile(args[1], listaLegendas);
         } catch (ArquivoLegendaWriteException e) {
@@ -141,7 +156,7 @@ public class TimeAdjustAction extends AbstractAction {
             System.exit(-1);
         }
 
-        System.out.println("O Tempo das Legendas foi ajustado com sucesso.");
+        System.out.println("\nO Tempo das Legendas foi ajustado com SUCESSO.");
     }
 
     /**
