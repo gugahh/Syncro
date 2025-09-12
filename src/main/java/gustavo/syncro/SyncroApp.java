@@ -3,6 +3,7 @@ package gustavo.syncro;
 import gustavo.syncro.actions.RenumerarAction;
 import gustavo.syncro.actions.TimeAdjustAction;
 import gustavo.syncro.actions.SplitAction;
+import gustavo.syncro.actions.CopyCatAction;
 import gustavo.syncro.utils.*;
 
 import java.io.*;
@@ -14,6 +15,8 @@ public class SyncroApp {
 	private static final RenumerarAction renumerarAction = RenumerarAction.getInstance();
 
     private static final SplitAction splitAction = SplitAction.getInstance();
+
+    private static final CopyCatAction copyCatAction = CopyCatAction.getInstance();
 
 
 	public SyncroApp(){
@@ -57,6 +60,9 @@ public class SyncroApp {
                 break;
             case "-SPLIT" :
                 splitAction.doAction(args);
+                break;
+            case "-COPYCAT" :
+                copyCatAction.doAction(args);
                 break;
 
             default:

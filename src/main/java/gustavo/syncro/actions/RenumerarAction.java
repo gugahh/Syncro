@@ -29,7 +29,6 @@ public class RenumerarAction extends AbstractAction {
     @Override
     public void doAction(String[] args) {
 
-        //Cleanup
         boolean fazerBackupLegenda = true;
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
@@ -37,7 +36,7 @@ public class RenumerarAction extends AbstractAction {
         List<Subtitle> listaLegendas;
 
         if(args.length < 4){ //Num de params menor que o esperado.
-            System.out.println("\tNumero de parametros incorreto");
+            System.out.println("\tERRO: Numero de parametros incorreto");
             System.out.println("\tpara realizar esta operacao.");
             System.out.println(HelpUtil.howToGetHelpStr);
             System.exit(-1);
@@ -124,12 +123,11 @@ public class RenumerarAction extends AbstractAction {
                                         String indiceLegendaInic,
                                         String indiceLegendaDesejada) {
 
-        // Testando a consistência do arquivo de legenda enviado.
+        // Testando a existencia do arquivo de legenda enviado.
         File arquivoLegenda = new File(fileName);
 
         if(!arquivoLegenda.exists()){
             return "\tErro: O arquivo solicitado nao existe.";
-            // System.out.println(HelpUtil.howToGetHelpStr);
         }
 
         //Verificando se os índices de legendas informados são inteiros.
