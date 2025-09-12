@@ -159,7 +159,7 @@ public class CopyCatAction extends AbstractAction {
                     "mas foi informado o indice " + idxInicArqDest;
         }
 
-        // Ccaso o indice do arquivo de destino seja diferente de 1,
+        // Caso o indice do arquivo de destino seja diferente de 1,
         // verificar se o timestamp AJUSTADO no arquivo de destino "atropela" a legenda anterior.
         if (!existeErro && idxInicArqDest > 1) {
             Subtitle legDestAtual = listaLegendasDest.get(idxInicArqDest - 1);
@@ -184,9 +184,6 @@ public class CopyCatAction extends AbstractAction {
             }
         }
 
-        //Todo: veficar, apos o processamento, se o arquivo de origem, ja considerado
-        // os indices, eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning (mas executar).
-
         // Se ocorreu qualquer erro de validacao nos testes acima... sair com erro.
         if (existeErro) {
             System.out.println("Erro: " + msgErro);
@@ -194,24 +191,60 @@ public class CopyCatAction extends AbstractAction {
             System.exit(-1);
         }
 
-        // Fazendo a copia dos timestamps, ignorando os indices.
-        // TODO: Considerar os indices.
-        int idxOrigem = 0;
-        int idxDestino = 0;
-        int posDeParada = 3; // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
+        int qtLegendasOrigem = ((idxFimArqOrig > 0) ? idxFimArqOrig : listaLegendasOrigem.size()) - idxInicArqOrig;
+        int qtLegendasDest = listaLegendasDest.size() - idxInicArqDest;
 
-        while (idxOrigem <= posDeParada) {
+        System.out.println("qtLegendasOrigem: " + qtLegendasOrigem);
+        System.out.println("qtLegendasDest: " + qtLegendasDest);
+
+        if ((qtLegendasOrigem - qtLegendasDest) == 0) {
+            System.out.println("\n\t- O arquivo de origem tem o mesmo numero de legendas,\n"+
+                    "\t  no intervalo especificado, que o arquivo de destino;\n" +
+                    "\t  todas as condicoes foram satisfeitas. Iniciando a sincronizacao.");
+        }
+
+        // Verificando se o arquivo de origem, ja considerando os indices desejados,
+        // eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning (mas executar).
+        if ((qtLegendasOrigem - qtLegendasDest) > 0) {
+            System.out.println("\n\t- Atenção: O arquivo de origem tem MAIS legendas,\n"+
+                    "\t  no intervalo especificado, que o arquivo de destino;\n" +
+                    "\t  isso eh permitido, mas esteja informado que existe essa diferenca de tamanho.");
+        }
+
+        if ((qtLegendasOrigem - qtLegendasDest) < 0) {
+            System.out.println("\n\t- Atenção: O arquivo de origem tem MENOS legendas,\n" +
+                    "\t  no intervalo especificado, que o arquivo de destino;\n" +
+                    "\t  isso NAO eh permitido, uma vez que ficariam legendas, no final do arquivo\n" +
+                    "\t  de destino, sem ajustar os tempos.\n" +
+                    "\t  Considere ajustar os intervalos de inicio e fim do arquivo de origem.");
+            System.exit(-1);
+        }
+
+        // Fazendo a copia dos timestamps, ja considerando os indices desejados
+        int idxOrigem = idxInicArqOrig - 1;
+        int idxDestino = idxInicArqDest - 1;
+
+        // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
+        int posDeParada = (idxFimArqOrig > 0) ? (idxFimArqOrig - 1) : (listaLegendasOrigem.size() - 1);
+        System.out.println("posDeParada: " + posDeParada);
+
+        // OBS: A lista de origem pode ser maior que a de destino, isso eh permitido.
+        while (idxOrigem <= posDeParada &&
+                idxDestino < listaLegendasDest.size()) { // Evitando ultrapassar o fim do arquivo de destino.
+
             Subtitle sbOrigem = listaLegendasOrigem.get(idxOrigem);
             Subtitle sbDestino = listaLegendasDest.get(idxDestino);
 
             sbDestino.setStartTime(sbOrigem.getStartTime());
             sbDestino.setEndTime(sbOrigem.getEndTime());
 
+            System.out.println("\t\tAtualizou a legenda de destino: " + idxDestino);
+            System.out.println("\t\t\tUtilizando o novo timestamp: " +
+                    sbOrigem.getStartTimeAsString() + " - " + sbOrigem.getEndTimeAsString());
+
             idxOrigem++;
             idxDestino++;
         }
-
-        // Todo: alterar o codigo acima, considerando os indices.
 
         //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
         if(fazerBackupLegenda) {
