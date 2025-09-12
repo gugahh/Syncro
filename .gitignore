@@ -47,3 +47,4 @@ syncro.iml
 .idea/sonarlint/
 .idea/jpa-buddy.xml
 
+*.bat

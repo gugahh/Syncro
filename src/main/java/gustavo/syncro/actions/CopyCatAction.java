@@ -1,8 +1,12 @@
 package gustavo.syncro.actions;
 
 import gustavo.syncro.Subtitle;
+import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
+import gustavo.syncro.exceptions.validacao.FileBackupException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
+import gustavo.syncro.utils.BackupFileUtil;
 import gustavo.syncro.utils.HelpUtil;
+import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
 
 import java.io.File;
@@ -27,7 +31,9 @@ public class CopyCatAction extends AbstractAction {
 
     @Override
     public void doAction(String[] args) {
-        // Parametros: [nomeArquOrigem] [indxInicio] [idxFinal] [nomeArqDest] [idxInicio] [-nobak]
+        // Parametros: [nomeArquOrigem] [idxInicioOrig] [idxFinalOrig] [nomeArqDest] [idxInicioDest] [-nobak]
+        //              [1]             [2]             [3]            [4]           [5]             [6]
+
         System.out.println("Entrou em CopyCatAction");
 
         boolean fazerBackupLegenda = true;
@@ -117,6 +123,57 @@ public class CopyCatAction extends AbstractAction {
             System.exit(-1);
         }
         System.out.println("Tamanho da Lista de Legendas de Destino: " + listaLegendasDest.size());
+
+        //Todo: verificar se o indice inicial e final do arquivo de origem sao validos.
+
+        //Todo: verificar se o indice inicial do arquivo de destino e valido.
+
+        //Todo: caso o indice do arquivo de destino seja diferente de 1,
+        // Caso o ajuste seja negativo (adiantar), verificar se o timestamp AJUSTADO
+        // no arquivo de destino "atropela" a legenda anterior.
+
+        //Todo: veficar, apos o processamento, se o arquivo de origem, ja considerado
+        // os indices, eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning.
+
+        // Todo: Fazer a copia dos timestamps, ignorando os indices.
+        int idxOrigem = 0;
+        int idxDestino = 0;
+        int posDeParada = 3; // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
+
+        while (idxOrigem <= posDeParada) {
+            Subtitle sbOrigem = listaLegendasOrigem.get(idxOrigem);
+            Subtitle sbDestino = listaLegendasDest.get(idxDestino);
+
+            sbDestino.setStartTime(sbOrigem.getStartTime());
+            sbDestino.setEndTime(sbOrigem.getEndTime());
+
+            idxOrigem++;
+            idxDestino++;
+        }
+
+        // Todo: alterar o codigo acima, considerando os indices.
+
+        //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
+        if(fazerBackupLegenda) {
+            BackupFileUtil bfu = new BackupFileUtil();
+            try {
+                System.out.println("Gerando um backup do arquivo de destino original...");
+                String nomeNovoArquivo = bfu.makeBackupFromFile(nomeArquivoDest);
+                System.out.println("\tNome do arquivo (backup) gerado: " + nomeNovoArquivo);
+            } catch (FileBackupException e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        }
+
+        //Salva as alterações no arquivo de origem.
+        try {
+            SubtitleFileUtil.saveChangedSubtitleFile(nomeArquivoDest, listaLegendasDest);
+        } catch (ArquivoLegendaWriteException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
 
         System.out.println("Executou com SUCESSO.");
     }
