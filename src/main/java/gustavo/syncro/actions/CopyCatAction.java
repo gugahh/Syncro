@@ -36,7 +36,6 @@ public class CopyCatAction extends AbstractAction {
 
         System.out.println("Entrou em CopyCatAction");
 
-        boolean fazerBackupLegenda = true;
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -47,8 +46,10 @@ public class CopyCatAction extends AbstractAction {
             System.exit(-1);
         }
 
+        boolean fazerBackupLegenda = true;
+
         if (args.length == 7) {
-            //Args[6] só pode ser -nobak.
+            //Como existe um Args[6], este só pode ser -nobak.
             if (args[6].equalsIgnoreCase("-nobak") || args[6].equalsIgnoreCase("-noback")) { //Usu solicitou não fazer backup
                 fazerBackupLegenda = false;
             } else {
@@ -124,7 +125,11 @@ public class CopyCatAction extends AbstractAction {
         }
         System.out.println("Tamanho da Lista de Legendas de Destino: " + listaLegendasDest.size());
 
+        //Todo: verificar, caso indice final do arquivo de origem diferente de (0, -1),
+        // se o indice final eh maior que o inicial.
+
         //Todo: verificar se o indice inicial e final do arquivo de origem sao validos.
+        // leia-se: aqueles indices existem mesmo no arquivo de origem.
 
         //Todo: verificar se o indice inicial do arquivo de destino e valido.
 
@@ -133,7 +138,7 @@ public class CopyCatAction extends AbstractAction {
         // no arquivo de destino "atropela" a legenda anterior.
 
         //Todo: veficar, apos o processamento, se o arquivo de origem, ja considerado
-        // os indices, eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning.
+        // os indices, eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning (mas executar).
 
         // Todo: Fazer a copia dos timestamps, ignorando os indices.
         int idxOrigem = 0;
@@ -166,7 +171,7 @@ public class CopyCatAction extends AbstractAction {
             }
         }
 
-        //Salva as alterações no arquivo de origem.
+        //Salva as alterações no arquivo de Destino.
         try {
             SubtitleFileUtil.saveChangedSubtitleFile(nomeArquivoDest, listaLegendasDest);
         } catch (ArquivoLegendaWriteException e) {
@@ -175,7 +180,7 @@ public class CopyCatAction extends AbstractAction {
             System.exit(-1);
         }
 
-        System.out.println("Executou com SUCESSO.");
+        System.out.println("\nOs timestamps das legendas do arquivo de Destino foram ajustadas com SUCESSO.");
     }
 
     /**
