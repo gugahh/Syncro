@@ -76,9 +76,9 @@ public class CopyCatAction extends AbstractAction {
         System.out.println("nomeArquivoOrigem: " + nomeArquivoOrigem);
         System.out.println("nomeArquivoDest: " + nomeArquivoDest);
 
-        int idxInicArqOrig;
-        int idxFimArqOrig;
-        int idxInicArqDest;
+        int idxInicArqOrig = 0;
+        int idxFimArqOrig = 0;
+        int idxInicArqDest = 0;
 
         try {
             idxInicArqOrig = Integer.parseInt(args[2]);
@@ -118,29 +118,84 @@ public class CopyCatAction extends AbstractAction {
         }
 
         if (null == listaLegendasDest || listaLegendasDest.isEmpty()) {
-            // throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
-            System.out.println("Lista de Legendas de Destino eh nula ou vazia.");
+            System.out.println("Erro: Lista de Legendas de Destino eh nula ou vazia.");
             System.out.println(HelpUtil.howToGetHelpStr);
             System.exit(-1);
         }
         System.out.println("Tamanho da Lista de Legendas de Destino: " + listaLegendasDest.size());
 
-        //Todo: verificar, caso indice final do arquivo de origem diferente de (0, -1),
+        // Iniciando validacoes sobre os arquivos fornecidos.
+        boolean existeErro = false;
+        String msgErro = "";
+
+        // Verificando, caso indice final do arquivo de origem diferente de (0, -1),
         // se o indice final eh maior que o inicial.
+        if (idxFimArqOrig > 0 && idxFimArqOrig < idxInicArqOrig) {
+            existeErro = true;
+            msgErro = "O indice final da legenda de origem nao pode ser menor que o indice inicial.";
+        }
 
-        //Todo: verificar se o indice inicial e final do arquivo de origem sao validos.
+        //Verificando se o indice inicial e final do arquivo de origem sao validos.
         // leia-se: aqueles indices existem mesmo no arquivo de origem.
+        if (!existeErro && idxInicArqOrig > listaLegendasOrigem.size()) {
+            existeErro = true;
+            msgErro = "O indice inicial da legenda de origem nao eh valido. " +
+                "O arquivo da legenda possui apenas " + listaLegendasOrigem.size() + " legendas, " +
+                "mas foi informado o indice " + idxInicArqOrig;
+        }
+        if (!existeErro && idxFimArqOrig > 0 && idxFimArqOrig > listaLegendasOrigem.size()) {
+            existeErro = true;
+            msgErro = "O indice final da legenda de origem nao eh valido. " +
+                    "O arquivo da legenda possui apenas " + listaLegendasOrigem.size() + " legendas, " +
+                    "mas foi informado o indice " + idxFimArqOrig;
+        }
 
-        //Todo: verificar se o indice inicial do arquivo de destino e valido.
+        // --
+        // Verificar se o indice inicial do arquivo de destino e valido.
+        if (!existeErro && idxInicArqDest > listaLegendasDest.size()) {
+            existeErro = true;
+            msgErro = "O indice inicial da legenda de destino nao eh valido. " +
+                    "O arquivo da legenda possui apenas " + listaLegendasDest.size() + " legendas, " +
+                    "mas foi informado o indice " + idxInicArqDest;
+        }
 
-        //Todo: caso o indice do arquivo de destino seja diferente de 1,
-        // Caso o ajuste seja negativo (adiantar), verificar se o timestamp AJUSTADO
-        // no arquivo de destino "atropela" a legenda anterior.
+        // Ccaso o indice do arquivo de destino seja diferente de 1,
+        // verificar se o timestamp AJUSTADO no arquivo de destino "atropela" a legenda anterior.
+        if (!existeErro && idxInicArqDest > 1) {
+            Subtitle legDestAtual = listaLegendasDest.get(idxInicArqDest - 1);
+            Subtitle legDestAnterior = listaLegendasDest.get(idxInicArqDest - 2);
+            int timestampFinalLegAnt = legDestAnterior.getEndTime();
+
+            Subtitle legOrigemInic = listaLegendasOrigem.get(idxInicArqOrig - 1);
+            int timestampInicLegOrig = legOrigemInic.getStartTime();
+
+            if (timestampInicLegOrig < timestampFinalLegAnt) {
+                existeErro = true;
+                msgErro = "O ajuste solicitado faria com que a legenda do arquivo de destino " +
+                        "imediatamente anterior a que foi solicitada (que seria a legenda " +
+                        (idxInicArqDest  - 1) + ") ficasse com um timestamp POSTERIOR a lengenda " +
+                        "sendo ajustada (" + idxInicArqDest + "), o que nao e permitido." +
+                        "\n Ts Final da legenda Anterior (" + (idxInicArqDest  - 1) + ") (no arq de destino) (" +
+                            (idxInicArqDest - 1) + "): " + legDestAnterior.getEndTimeAsString() +
+                        "\n Ts de Inicio da Legenda Atual (no arq de destino) (" + idxInicArqDest + ") especificada (" +
+                            idxInicArqDest + "): " + legDestAtual.getStartTimeAsString() +
+                        "\n Timestamp de inicio desejado (invalido) do arq de origem: " +
+                            legOrigemInic.getStartTimeAsString() + ".";
+            }
+        }
 
         //Todo: veficar, apos o processamento, se o arquivo de origem, ja considerado
         // os indices, eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning (mas executar).
 
-        // Todo: Fazer a copia dos timestamps, ignorando os indices.
+        // Se ocorreu qualquer erro de validacao nos testes acima... sair com erro.
+        if (existeErro) {
+            System.out.println("Erro: " + msgErro);
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
+
+        // Fazendo a copia dos timestamps, ignorando os indices.
+        // TODO: Considerar os indices.
         int idxOrigem = 0;
         int idxDestino = 0;
         int posDeParada = 3; // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
