@@ -30,7 +30,7 @@
 #
 #  Exemplo:
 #  --------
-#       java -jar syncro.jar -renum heroes.srt 1 3 [-nobak]\n
+#       java -jar syncro.jar -renum heroes.srt 1 3 [-nobak] 
 #           o comando acima irá renumerar todas as legendas a partir da
 #           legenda 1. Esta se tornara a legenda 3,
 #           a legenda 2 se tornara a 4, e assim por diante
