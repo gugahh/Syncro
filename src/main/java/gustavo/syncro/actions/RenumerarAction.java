@@ -13,7 +13,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Classe responsavel por tudo o que for exclusivo a Renumerar Legendas
+ * RenumerarAction: Renumera os indices das Legendas de um arquivo .srt
  */
 public class RenumerarAction extends AbstractAction {
 
@@ -28,6 +28,8 @@ public class RenumerarAction extends AbstractAction {
 
     @Override
     public void doAction(String[] args) {
+
+        System.out.println("\nSyncro App - executando RenumerarAction\n");
 
         boolean fazerBackupLegenda = true;
 

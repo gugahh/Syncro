@@ -10,8 +10,9 @@ import gustavo.syncro.utils.SubtitleUtil;
 import java.util.List;
 
 /**
- * Permite quebrar uma legendas em N outras, de modo a facilitar
- * a traducao dos pedacoes utilizando uma IA gratuita.
+ * SplitAction: Permite quebrar uma legendas em N outras, de modo a facilitar
+ * a traducao dos "pedacos" utilizando uma IA gratuita;
+ * Estas costumam ser "preguicosas" quando se solicita uma traducao grande.
  */
 public class SplitAction extends AbstractAction {
 
@@ -30,6 +31,8 @@ public class SplitAction extends AbstractAction {
     public void doAction(String[] args) {
 
         // Parametros: [nomeLegenda] [qt_legendas_por_arquivo]
+
+        System.out.println("\nSyncro App - executando SplitAction\n");
 
         boolean fazerBackupLegenda = true;
 

@@ -18,7 +18,7 @@ import gustavo.syncro.utils.timeconverter.SegundoFracionadoConverter;
 import java.util.List;
 
 /**
- * Action utilizada para ajustar o tempo de todas (ou de algumas)
+ * TimeAdjustAction: ajusta o tempo de todas (ou de algumas)
  * legendas em um arquivo, adiantando ou atrasando-as.
  */
 public class TimeAdjustAction extends AbstractAction {
@@ -43,6 +43,11 @@ public class TimeAdjustAction extends AbstractAction {
     @Override
     public void doAction(String[] args) {
 
+        // Parametros : [arquivo] [tempo]   [indiceLegenda] [-nobak]
+        //              args[1]   args[2]   args[3](opc)    args[3 ou 4] (opc)
+
+        System.out.println("\nSyncro App - executando TimeAdjustAction\n");
+
         boolean fazerBackupLegenda = true; // O padrao eh fazer backup.
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
@@ -61,9 +66,6 @@ public class TimeAdjustAction extends AbstractAction {
         /* Nº de params e legal. Pode-se tentar comecar.
          * No caso de qualquer método falhar a operação
          * (execução da App) deve ser abortada. */
-
-        // args[0] args[1]   args[2]  args[3](opc)     args[3 ou 4] (opc)
-        //[-adjust [arquivo] [tempo] [indiceLegenda] ] [-nobak]
 
         String indiceLegendaInicial = null; //default caso usuário não passe uma referência de índice
 

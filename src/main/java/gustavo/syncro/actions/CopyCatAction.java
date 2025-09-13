@@ -13,10 +13,11 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Executa o metodo CopyCat: copia os timestamps das legendas do arquivo
+ * CopyCat: copia os timestamps das legendas do arquivo
  * de origem para o arquivo de destino, sem alterar o texto das legendas, em si.
  * Eh util para acertar os tempos de duas legendas do mesmo filme, de
  * idiomas diferentes, porem em que uma esta com o tempo certo e a outra, nao.
+ * Criado em set/2025.
  */
 public class CopyCatAction extends AbstractAction {
 
@@ -34,8 +35,7 @@ public class CopyCatAction extends AbstractAction {
         // Parametros: [nomeArquOrigem] [idxInicioOrig] [idxFinalOrig] [nomeArqDest] [idxInicioDest] [-nobak]
         //              [1]             [2]             [3]            [4]           [5]             [6]
 
-        System.out.println("Entrou em CopyCatAction");
-
+        System.out.println("\nSyncro App - executando CopyCatAction\n");
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
@@ -73,8 +73,10 @@ public class CopyCatAction extends AbstractAction {
         String nomeArquivoOrigem = args[1];
         String nomeArquivoDest = args[4];
 
-        System.out.println("nomeArquivoOrigem: " + nomeArquivoOrigem);
-        System.out.println("nomeArquivoDest: " + nomeArquivoDest);
+        System.out.println("\t- Arquivo de Origem: " + nomeArquivoOrigem);
+        System.out.printf("\t\t- Indices de legenda a serem copiados: de [%s] a [%s].%n", args[2], args[3]);
+        System.out.println("\n\t- Arquivo de Destino: " + nomeArquivoDest);
+        System.out.printf("\t\t- Indices de legenda a serem sobrescritos: de [%s] em diante.\n%n", args[5]);
 
         int idxInicArqOrig = 0;
         int idxFimArqOrig = 0;
@@ -85,9 +87,9 @@ public class CopyCatAction extends AbstractAction {
             idxFimArqOrig = Integer.parseInt(args[3]);
             idxInicArqDest = Integer.parseInt(args[5]);
 
-            System.out.println("idxInicArqOrig: " + idxInicArqOrig);
-            System.out.println("idxFimArqOrig:" + idxFimArqOrig);
-            System.out.println("idxInicArqDest: " + idxInicArqDest);
+//            System.out.println("idxInicArqOrig: " + idxInicArqOrig);
+//            System.out.println("idxFimArqOrig:" + idxFimArqOrig);
+//            System.out.println("idxInicArqDest: " + idxInicArqDest);
         } catch(NumberFormatException e) {
             System.out.println("ERRO inesperado. Codigo -20001"); //Erro de programacao!
             System.exit(-1);
@@ -103,11 +105,10 @@ public class CopyCatAction extends AbstractAction {
 
         if (null == listaLegendasOrigem || listaLegendasOrigem.isEmpty()) {
             // throw new RuntimeException("Lista de Legendas eh nula ou vazia.");
-            System.out.println("Lista de Legendas de Origem eh nula ou vazia.");
+            System.out.println("Erro: Lista de Legendas de Origem eh nula ou vazia.");
             System.out.println(HelpUtil.howToGetHelpStr);
             System.exit(-1);
         }
-        System.out.println("Tamanho da Lista de Legendas de Origem: " + listaLegendasOrigem.size());
 
         // Carregando a Lista de Legendas do arquivo de Destino
         List<Subtitle> listaLegendasDest;
@@ -122,9 +123,82 @@ public class CopyCatAction extends AbstractAction {
             System.out.println(HelpUtil.howToGetHelpStr);
             System.exit(-1);
         }
-        System.out.println("Tamanho da Lista de Legendas de Destino: " + listaLegendasDest.size());
+        System.out.printf("\t- Tamanho das Lista de Legendas - Origem: [%d] - Destino: [%d]%n",
+                listaLegendasOrigem.size(), listaLegendasDest.size());
 
-        // Iniciando validacoes sobre os arquivos fornecidos.
+        // Realizando validacoes sobre os arquivos fornecidos.
+        validaArquivos(idxInicArqOrig, idxFimArqOrig, idxInicArqDest, listaLegendasOrigem, listaLegendasDest);
+
+        // Fazendo a copia dos timestamps, ja considerando os indices desejados
+        int idxOrigem = idxInicArqOrig - 1;
+        int idxDestino = idxInicArqDest - 1;
+
+        // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
+        int posDeParada = (idxFimArqOrig > 0) ? (idxFimArqOrig - 1) : (listaLegendasOrigem.size() - 1);
+        // System.out.println("posDeParada: " + posDeParada);
+
+        // OBS: A lista de origem pode ser maior que a de destino, isso eh permitido.
+        while (idxOrigem <= posDeParada &&
+                idxDestino < listaLegendasDest.size()) { // Evitando ultrapassar o fim do arquivo de destino.
+
+            Subtitle sbOrigem = listaLegendasOrigem.get(idxOrigem);
+            Subtitle sbDestino = listaLegendasDest.get(idxDestino);
+
+            sbDestino.setStartTime(sbOrigem.getStartTime());
+            sbDestino.setEndTime(sbOrigem.getEndTime());
+
+            /*
+            System.out.println("\t\tAtualizou a legenda de destino: " + idxDestino);
+            System.out.println("\t\t\tUtilizando o novo timestamp: " +
+                    sbOrigem.getStartTimeAsString() + " - " + sbOrigem.getEndTimeAsString());
+             */
+
+            idxOrigem++;
+            idxDestino++;
+        }
+
+        //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
+        if(fazerBackupLegenda) {
+            BackupFileUtil bfu = new BackupFileUtil();
+            try {
+                System.out.println("\n\t- Gerando um backup do arquivo de destino original...");
+                String nomeNovoArquivo = bfu.makeBackupFromFile(nomeArquivoDest);
+                System.out.println("\t\tNome do arquivo (backup) gerado: " + nomeNovoArquivo);
+            } catch (FileBackupException e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        }
+
+        //Salva as alterações no arquivo de Destino.
+        try {
+            SubtitleFileUtil.saveChangedSubtitleFile(nomeArquivoDest, listaLegendasDest);
+        } catch (ArquivoLegendaWriteException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
+
+        System.out.println("\nOs timestamps das legendas do arquivo de Destino foram ajustados com SUCESSO.");
+    }
+
+    /**
+     * Efetua as validacoes das Liatas de Legendas de Origem e Destino,
+     * considerando os parametros de processamento fornecidos.
+     * Realiza System.exit(-1) em caso de erro, e exibe observacoes quando pertinente.
+     *
+     * @param idxInicArqOrig - indice inicial do arquivo de origem
+     * @param idxFimArqOrig - indice final do arquivo de origem
+     * @param idxInicArqDest  - indice final do arquivo de origem
+     * @param listaLegendasOrigem - Lista de Legendas de Origem
+     * @param listaLegendasDest - Lista de Legendas de Destino
+     */
+    void validaArquivos(int idxInicArqOrig,
+                        int idxFimArqOrig,
+                        int idxInicArqDest,
+                        List<Subtitle> listaLegendasOrigem,
+                        List<Subtitle> listaLegendasDest
+                        ) {
         boolean existeErro = false;
         String msgErro = "";
 
@@ -140,8 +214,8 @@ public class CopyCatAction extends AbstractAction {
         if (!existeErro && idxInicArqOrig > listaLegendasOrigem.size()) {
             existeErro = true;
             msgErro = "O indice inicial da legenda de origem nao eh valido. " +
-                "O arquivo da legenda possui apenas " + listaLegendasOrigem.size() + " legendas, " +
-                "mas foi informado o indice " + idxInicArqOrig;
+                    "O arquivo da legenda possui apenas " + listaLegendasOrigem.size() + " legendas, " +
+                    "mas foi informado o indice " + idxInicArqOrig;
         }
         if (!existeErro && idxFimArqOrig > 0 && idxFimArqOrig > listaLegendasOrigem.size()) {
             existeErro = true;
@@ -176,11 +250,11 @@ public class CopyCatAction extends AbstractAction {
                         (idxInicArqDest  - 1) + ") ficasse com um timestamp POSTERIOR a lengenda " +
                         "sendo ajustada (" + idxInicArqDest + "), o que nao e permitido." +
                         "\n Ts Final da legenda Anterior (" + (idxInicArqDest  - 1) + ") (no arq de destino) (" +
-                            (idxInicArqDest - 1) + "): " + legDestAnterior.getEndTimeAsString() +
+                        (idxInicArqDest - 1) + "): " + legDestAnterior.getEndTimeAsString() +
                         "\n Ts de Inicio da Legenda Atual (no arq de destino) (" + idxInicArqDest + ") especificada (" +
-                            idxInicArqDest + "): " + legDestAtual.getStartTimeAsString() +
+                        idxInicArqDest + "): " + legDestAtual.getStartTimeAsString() +
                         "\n Timestamp de inicio desejado (invalido) do arq de origem: " +
-                            legOrigemInic.getStartTimeAsString() + ".";
+                        legOrigemInic.getStartTimeAsString() + ".";
             }
         }
 
@@ -194,8 +268,8 @@ public class CopyCatAction extends AbstractAction {
         int qtLegendasOrigem = ((idxFimArqOrig > 0) ? idxFimArqOrig : listaLegendasOrigem.size()) - idxInicArqOrig;
         int qtLegendasDest = listaLegendasDest.size() - idxInicArqDest;
 
-        System.out.println("qtLegendasOrigem: " + qtLegendasOrigem);
-        System.out.println("qtLegendasDest: " + qtLegendasDest);
+        // System.out.println("qtLegendasOrigem: " + qtLegendasOrigem);
+        // System.out.println("qtLegendasDest: " + qtLegendasDest);
 
         if ((qtLegendasOrigem - qtLegendasDest) == 0) {
             System.out.println("\n\t- O arquivo de origem tem o mesmo numero de legendas,\n"+
@@ -206,69 +280,19 @@ public class CopyCatAction extends AbstractAction {
         // Verificando se o arquivo de origem, ja considerando os indices desejados,
         // eh MAIOR (mais legendas) que o arquivo de destino. Exibir Warning (mas executar).
         if ((qtLegendasOrigem - qtLegendasDest) > 0) {
-            System.out.println("\n\t- Atenção: O arquivo de origem tem MAIS legendas,\n"+
+            System.out.println("\n\t- Atencao: O arquivo de origem tem MAIS legendas,\n"+
                     "\t  no intervalo especificado, que o arquivo de destino;\n" +
                     "\t  isso eh permitido, mas esteja informado que existe essa diferenca de tamanho.");
         }
 
         if ((qtLegendasOrigem - qtLegendasDest) < 0) {
-            System.out.println("\n\t- Atenção: O arquivo de origem tem MENOS legendas,\n" +
+            System.out.println("\n\t- Atencao: O arquivo de origem tem MENOS legendas,\n" +
                     "\t  no intervalo especificado, que o arquivo de destino;\n" +
                     "\t  isso NAO eh permitido, uma vez que ficariam legendas, no final do arquivo\n" +
                     "\t  de destino, sem ajustar os tempos.\n" +
                     "\t  Considere ajustar os intervalos de inicio e fim do arquivo de origem.");
             System.exit(-1);
         }
-
-        // Fazendo a copia dos timestamps, ja considerando os indices desejados
-        int idxOrigem = idxInicArqOrig - 1;
-        int idxDestino = idxInicArqDest - 1;
-
-        // Indice da ultima legenda a processar, ajustado usando indice inic = 0.
-        int posDeParada = (idxFimArqOrig > 0) ? (idxFimArqOrig - 1) : (listaLegendasOrigem.size() - 1);
-        System.out.println("posDeParada: " + posDeParada);
-
-        // OBS: A lista de origem pode ser maior que a de destino, isso eh permitido.
-        while (idxOrigem <= posDeParada &&
-                idxDestino < listaLegendasDest.size()) { // Evitando ultrapassar o fim do arquivo de destino.
-
-            Subtitle sbOrigem = listaLegendasOrigem.get(idxOrigem);
-            Subtitle sbDestino = listaLegendasDest.get(idxDestino);
-
-            sbDestino.setStartTime(sbOrigem.getStartTime());
-            sbDestino.setEndTime(sbOrigem.getEndTime());
-
-            System.out.println("\t\tAtualizou a legenda de destino: " + idxDestino);
-            System.out.println("\t\t\tUtilizando o novo timestamp: " +
-                    sbOrigem.getStartTimeAsString() + " - " + sbOrigem.getEndTimeAsString());
-
-            idxOrigem++;
-            idxDestino++;
-        }
-
-        //Criar o Backup, se desejado (se tudo deu certo, agora eh a hora de faze-lo).
-        if(fazerBackupLegenda) {
-            BackupFileUtil bfu = new BackupFileUtil();
-            try {
-                System.out.println("Gerando um backup do arquivo de destino original...");
-                String nomeNovoArquivo = bfu.makeBackupFromFile(nomeArquivoDest);
-                System.out.println("\tNome do arquivo (backup) gerado: " + nomeNovoArquivo);
-            } catch (FileBackupException e) {
-                System.out.println(e.getMessage());
-                System.exit(-1);
-            }
-        }
-
-        //Salva as alterações no arquivo de Destino.
-        try {
-            SubtitleFileUtil.saveChangedSubtitleFile(nomeArquivoDest, listaLegendasDest);
-        } catch (ArquivoLegendaWriteException e) {
-            System.out.println(e.getMessage());
-            System.out.println(HelpUtil.howToGetHelpStr);
-            System.exit(-1);
-        }
-
-        System.out.println("\nOs timestamps das legendas do arquivo de Destino foram ajustadas com SUCESSO.");
     }
 
     /**
@@ -279,7 +303,7 @@ public class CopyCatAction extends AbstractAction {
      * @param args argumentos da linha de comando
      * @return nulo, ou um erro.
      */
-    private String testaParamsEntrada(String[] args) {
+    String testaParamsEntrada(String[] args) {
         // Parametros: [nomeArquOrigem] [idxInicioOrig] [idxFinalOrig] [nomeArqDest] [idxInicioDest] [-nobak]
         //              [1]             [2]             [3]            [4]           [5]             [6]
 
