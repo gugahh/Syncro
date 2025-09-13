@@ -1,12 +1,7 @@
 package gustavo.syncro;
 
-import gustavo.syncro.actions.RenumerarAction;
-import gustavo.syncro.actions.TimeAdjustAction;
-import gustavo.syncro.actions.SplitAction;
-import gustavo.syncro.actions.CopyCatAction;
+import gustavo.syncro.actions.*;
 import gustavo.syncro.utils.*;
-
-import java.io.*;
 
 public class SyncroApp {
 
@@ -18,11 +13,13 @@ public class SyncroApp {
 
     private static final CopyCatAction copyCatAction = CopyCatAction.getInstance();
 
+    private static final AbstractAction concatAction = ConcatAction.getInstance();
+
 
 	public SyncroApp(){
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 
 		if(args.length == 0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
@@ -31,12 +28,10 @@ public class SyncroApp {
 		}
 
 		// TODO: Usar regex para simplificar abaixo.
-		if(args.length > 0 &&
-				(args[0].equalsIgnoreCase("-help") || 
-						args[0].equalsIgnoreCase("-h") ||
-						args[0].equalsIgnoreCase("/help") ||
-						args[0].equalsIgnoreCase("/h"))
-		   ){
+		if (args[0].equalsIgnoreCase("-help") ||
+                args[0].equalsIgnoreCase("-h") ||
+                args[0].equalsIgnoreCase("/help") ||
+                args[0].equalsIgnoreCase("/h")) {
 			//Usu solicitou um help estendido.
 			SyncroHelp.printExtendedHelp();
 			System.exit(0);
@@ -64,13 +59,14 @@ public class SyncroApp {
             case "-COPYCAT" :
                 copyCatAction.doAction(args);
                 break;
+            case "-CONCAT" :
+                concatAction.doAction(args);
+                break;
 
             default:
                 System.out.println("Parametro Invalido.");
                 System.out.println(HelpUtil.howToGetHelpStr);
                 System.exit(0);
-        }
-
+        } //switch
 	}//main
-
 }

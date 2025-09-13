@@ -144,24 +144,28 @@ public class SyncroHelp {
 		System.out.println(basicHelp);
 	}
 
-	public static void printExtendedHelp() throws IOException {
+	public static void printExtendedHelp()  {
 		InputStreamReader inp = new InputStreamReader(System.in);
+        try {
+            int contador = 0;
+            for (StringBuilder sb : extendedHelp) {
+                // clearConsole();
+                System.out.print(sb);
 
-        int contador = 0;
-		for(StringBuilder sb: extendedHelp){
-            // clearConsole();
-			System.out.print(extendedHelp[contador]);
-
-            if (contador < extendedHelp.length - 1) {
-                System.out.print("\n  -- Pressione enter (return) para continuar --\n");
-                inp.read(); //Aguarda input do usuário. Menos no ultimo item.
+                if (contador < extendedHelp.length - 1) {
+                    System.out.print("\n  -- Pressione enter (return) para continuar --\n");
+                    inp.read(); //Aguarda input do usuário. Menos no ultimo item.
+                }
+                contador++;
             }
-            contador++;
-		}
+        } catch (IOException ioex){
+            System.out.print("Excessao inesperada. Codigo -20002");
+            System.exit(-1);
+        }
 	}
 
-
-    public final static void clearConsole() {
+    /*
+    public static void clearConsole() {
         try {
             final String os = System.getProperty("os.name");
             if (os.contains("Windows")) {
@@ -170,7 +174,9 @@ public class SyncroHelp {
                 Runtime.getRuntime().exec("clear");
             }
         } catch (final Exception e) {
-            // Handle exceptions, e.g., if the command fails
+            System.out.print("Excessao inesperada. Codigo -20003");
+            System.exit(-1);
         }
     }
+     */
 }

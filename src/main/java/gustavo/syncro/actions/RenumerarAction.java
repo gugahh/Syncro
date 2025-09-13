@@ -160,9 +160,8 @@ public class RenumerarAction extends AbstractAction {
         int intInitialIndex = Integer.parseInt(initialIndex);
         int modificador = Integer.parseInt(newIndex) - intInitialIndex;
 
-        for(int i=0; i < objetosLegenda1.size(); i++){
-            Subtitle st = objetosLegenda1.get(i);
-            if(st.getId() >= intInitialIndex) {
+        for (Subtitle st : objetosLegenda1) {
+            if (st.getId() >= intInitialIndex) {
                 valorAModificarFoiEncontrado = true;
                 st.setId(st.getId() + modificador);
             }
