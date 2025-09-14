@@ -1,7 +1,10 @@
 package gustavo.syncro.actions;
 
 import gustavo.syncro.Subtitle;
+import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
+import gustavo.syncro.utils.HelpUtil;
+import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
 
 import java.io.File;
@@ -79,7 +82,7 @@ public class ConcatAction extends AbstractAction {
 
         List<PedacoLegenda> pedacsList = new ArrayList<>(); // Cada um dos arquivos e suas legendas
         PedacoLegenda umPedaco;         // Contera apenas o arquivo atual sendo processado
-        List<Subtitle> listaLegendas;
+        List<Subtitle> listaLegendasTemp;
 
         // Tudo validado.
         // Agora faremos um loop para pegar cada um dos arquivos, sequencialmente,
@@ -93,12 +96,12 @@ public class ConcatAction extends AbstractAction {
             if (arqu2.exists()) {
                 System.out.printf("\t- Arquivo encontrado!\n");
                 try {
-                    listaLegendas = sbtUtil.obtemListaLegendasFromFile(args[1]);
+                    listaLegendasTemp = sbtUtil.obtemListaLegendasFromFile(nomeArquivo);
+                    umPedaco = new PedacoLegenda(idx, nomeArquivo, listaLegendasTemp);
+                    pedacsList.add(umPedaco);
                 } catch (ValidacaoException e) {
                     throw new RuntimeException(e);
                 }
-                umPedaco = new PedacoLegenda(idx, nomeArquivo, listaLegendas);
-                pedacsList.add(umPedaco);
             } else {
                 System.out.printf("\t- Arquivo nao encontrado.\n");
                 break;
@@ -106,6 +109,23 @@ public class ConcatAction extends AbstractAction {
         }
 
         //TODO: Segundo loop: monta os pedacos.
+        List<Subtitle> listaLegendasFinal = new ArrayList<>();
+        for (PedacoLegenda p : pedacsList) {
+            listaLegendasFinal.addAll(p.listaLegendas);
+        }
+
+        //TODO: Criar backup.
+
+        // Gravando com um nome temporario (por hora)
+        String nomeArqFinal = prefixoNmArquivo + "_concat.srt";
+        //Salva as alterações no arquivo de origem.
+        try {
+            SubtitleFileUtil.saveChangedSubtitleFile(nomeArqFinal, listaLegendasFinal);
+        } catch (ArquivoLegendaWriteException e) {
+            System.out.println(e.getMessage());
+            System.out.println(HelpUtil.howToGetHelpStr);
+            System.exit(-1);
+        }
 
         System.out.println("\nExecutado com SUCESSO.\n");
     }
