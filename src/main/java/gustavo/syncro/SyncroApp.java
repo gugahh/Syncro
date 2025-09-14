@@ -13,7 +13,7 @@ public class SyncroApp {
 
     private static final CopyCatAction copyCatAction = CopyCatAction.getInstance();
 
-    private static final AbstractAction concatAction = ConcatAction.getInstance();
+    private static final ConcatAction concatAction = ConcatAction.getInstance();
 
 
 	public SyncroApp(){
