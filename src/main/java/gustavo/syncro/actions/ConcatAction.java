@@ -2,7 +2,9 @@ package gustavo.syncro.actions;
 
 import gustavo.syncro.Subtitle;
 import gustavo.syncro.exceptions.ArquivoLegendaWriteException;
+import gustavo.syncro.exceptions.validacao.FileBackupException;
 import gustavo.syncro.exceptions.validacao.ValidacaoException;
+import gustavo.syncro.utils.BackupFileUtil;
 import gustavo.syncro.utils.HelpUtil;
 import gustavo.syncro.utils.SubtitleFileUtil;
 import gustavo.syncro.utils.SubtitleUtil;
@@ -60,14 +62,12 @@ public class ConcatAction extends AbstractAction {
         try {
             // Nome do arquivo, sem o hifen, sem a parte numerica, e sem a extensao.
             prefixoNmArquivo = nomeArq1.substring(0, (nomeArq1.length() - 8));
-            System.out.println(prefixoNmArquivo);
 
             //Extraindo a parte numerica do nome
             String parteNumericaStr = nomeArq1.substring((nomeArq1.length() - 7), (nomeArq1.length() - 4));
             idxArquivo1 = Integer.parseInt(parteNumericaStr);
-            System.out.println(idxArquivo1);
         } catch (StringIndexOutOfBoundsException | NumberFormatException ex) {
-            System.out.printf("\t- Erro no tratamento do nome de arquivo. Codigo: -20003.\n", nomeArq1);
+            System.out.print("\t- Erro no tratamento do nome de arquivo. Codigo: -20003.\n");
             System.exit(-1);
         }
 
@@ -86,39 +86,52 @@ public class ConcatAction extends AbstractAction {
 
         // Tudo validado.
         // Agora faremos um loop para pegar cada um dos arquivos, sequencialmente,
-        // ate eles nao existirem mais. O ultimo arquivo possivel eh o de indice 999.
-        // int numArqProcessado = 0;
+        // ate nao existirem mais arquivos. O ultimo arquivo possivel eh o de indice 999.
         for (int idx = idxArquivo1; idx <= 999; idx++) {
             String nomeArquivo = String.format("%s_%03d.srt", prefixoNmArquivo, idx);
             System.out.printf("\tProcessando: " + nomeArquivo);
 
             File arqu2 = new File(nomeArquivo);
             if (arqu2.exists()) {
-                System.out.printf("\t- Arquivo encontrado!\n");
+                System.out.print("\t- Arquivo encontrado!");
                 try {
                     listaLegendasTemp = sbtUtil.obtemListaLegendasFromFile(nomeArquivo);
+                    System.out.printf("\t- (%d legendas)\n", listaLegendasTemp.size());
                     umPedaco = new PedacoLegenda(idx, nomeArquivo, listaLegendasTemp);
                     pedacsList.add(umPedaco);
                 } catch (ValidacaoException e) {
                     throw new RuntimeException(e);
                 }
             } else {
-                System.out.printf("\t- Arquivo nao encontrado.\n");
+                System.out.print("\t- Nao encontrado (nao ha mais partes a processar).\n");
                 break;
             }
         }
 
-        //TODO: Segundo loop: monta os pedacos.
+        //Segundo loop: combina os pedacos em um unico array
         List<Subtitle> listaLegendasFinal = new ArrayList<>();
         for (PedacoLegenda p : pedacsList) {
             listaLegendasFinal.addAll(p.listaLegendas);
         }
 
-        //TODO: Criar backup.
-
-        // Gravando com um nome temporario (por hora)
+        // Defininindo o nome do arquivo de Saida:  nome original + concat (arbitrei isso).
         String nomeArqFinal = prefixoNmArquivo + "_concat.srt";
-        //Salva as alterações no arquivo de origem.
+
+        //Criando um backup (apenas se for sobrescrever o arquivo de saida.
+        if ((new File(nomeArqFinal)).exists()) {
+            System.out.printf("\n\t- Ja existe um arquivo com o nome %s. Vamos criar um backup do arquivo.\n", nomeArqFinal);
+
+            BackupFileUtil bfu = new BackupFileUtil();
+            try {
+                String nomeArquivoBackup = bfu.makeBackupFromFile(nomeArqFinal);
+                System.out.println("\t\tNome do arquivo (de backup) gerado: " + nomeArquivoBackup);
+            } catch (FileBackupException e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        }
+
+        //Salva as alterações no arquivo de saida.
         try {
             SubtitleFileUtil.saveChangedSubtitleFile(nomeArqFinal, listaLegendasFinal);
         } catch (ArquivoLegendaWriteException e) {
@@ -135,7 +148,7 @@ public class ConcatAction extends AbstractAction {
      */
     class PedacoLegenda {
 
-        int indice = 0;
+        int indice;
         String nomeArquivo;
         List<Subtitle> listaLegendas;
 
