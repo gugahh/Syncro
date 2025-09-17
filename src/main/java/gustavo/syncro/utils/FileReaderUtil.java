@@ -10,69 +10,62 @@ public class FileReaderUtil {
 
     public static final String ERRO_LEITURA_LEGENDA = "Ocorreu um erro ao ler o arquivo de legenda %s";
 
-    public static List<String> readFromFile(String fileName
-    ) throws FileReadException, IOException {
-        List<String> stringList = new ArrayList<>();
-        readFromFile(fileName, stringList, false);
-        return stringList;
-    }
-
     /**
-     * Le um arquivo fornecido, e o atribui cada uma das linhas do arquivo
-     * ao List<String> definido em stringList.
-     * Caso fazerBackupLegenda seja true, faz concorrentemente uma copia (backup) do arquivo.
-     * @param fileName
-     * @param stringList
-     * @param fazerBackupLegenda
+     * Le um arquivo fornecido, e a partir deste cria um List<String>,
+     * contanto, em cada item da lista, uma das linhas do arquivo.
+     * Remove automaticamente as linhas em branco.
+     *
+     * @param fileName nome do arquivo a ser processado.
+     * @return lista de Strings
      * @throws FileReadException
      * @throws IOException
      */
-    //TODO: tornar private.
-    public static void readFromFile(String fileName,
-                      List<String> stringList,
-                      boolean fazerBackupLegenda
-                      ) throws FileReadException, IOException {
+    public List<String> readFromFile(String fileName
+    ) throws FileReadException, IOException {
+        return this.readFromFile(fileName, true);
+    }
 
-        File arquivoBackup;
+    /**
+     * Le um arquivo fornecido, e a partir deste cria um List<String>,
+     * contanto, em cada item da lista, uma das linhas do arquivo.
+     * Nao Remove automaticamente as linhas em branco.
+     *
+     * @param fileName nome do arquivo a ser processado.
+     * @param removeLinhasEmBranco caso true, remove as linhas em branco.
+     * @return lista de Strings
+     * @throws FileReadException
+     * @throws IOException
+     */
+    public List<String> readFromFile(String fileName,
+                                            boolean removeLinhasEmBranco
+    ) throws FileReadException, IOException {
+        List<String> stringList = new ArrayList<>();
+
         File arquivoLegenda = new File(fileName);
 
         LineNumberReader bfread = null;
-        PrintWriter writer = null;
         String currentLine;
 
         try {
             bfread = new LineNumberReader(new FileReader(arquivoLegenda)); //Tentado abrir arquivo. Operação pode falhar.
 
-            if (fazerBackupLegenda) {
-                arquivoBackup = new File("Backup_" + fileName.replace(".srt", "") + "_" + System.currentTimeMillis() + ".srt");
-                writer = new PrintWriter(new FileWriter(arquivoBackup));
-            }
-
             while ((currentLine = bfread.readLine()) != null) { // Loop: Lendo todas as linhas do arquivo texto até o fim.
-
-                //Escrevendo cópia backup
-                if (fazerBackupLegenda) {
-                    writer.println(currentLine);
-                }
 
                 //Carregando ArrayList
                 currentLine = currentLine.trim();
-                if (currentLine.length() > 0) { //Evitando linhas em branco
+                if (removeLinhasEmBranco && !currentLine.isEmpty()) { //Evitando linhas em branco, se solicitado.
                     stringList.add(currentLine);
                 }
             }
-        } catch(NullPointerException np) {
-            throw new FileReadException(String.format(ERRO_LEITURA_LEGENDA, stringList), np);
-        } catch (IOException ioex) {
-            throw new FileReadException(String.format(ERRO_LEITURA_LEGENDA, stringList), ioex);
-
+        } catch(NullPointerException | IOException ex) {
+            throw new FileReadException(String.format(ERRO_LEITURA_LEGENDA, stringList), ex);
         } finally {
             if(bfread!=null){
                 bfread.close();
             }
-            if(writer!=null){
-                writer.close();
-            }
         }
+
+        return stringList;
     }
+
 }

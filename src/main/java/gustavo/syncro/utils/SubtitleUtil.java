@@ -106,7 +106,7 @@ public class SubtitleUtil {
     public List<Subtitle> obtemListaLegendasFromFile(String fileName)
             throws ValidacaoException, RuntimeException {
 
-        List<String> arquivoOriginal = new ArrayList<>();
+        List<String> arquivoOriginal = null;
 
         // Lista com cada uma das linhas do arquivo original, como texto.
         // Guarda as posicoes das Legendas (nos de linha) no texto original.
@@ -120,7 +120,8 @@ public class SubtitleUtil {
 
 
         try {
-            arquivoOriginal = FileReaderUtil.readFromFile(fileName);
+            FileReaderUtil fileReaderUtil = new FileReaderUtil();
+            arquivoOriginal = fileReaderUtil.readFromFile(fileName);
         } catch (FileReadException e) {
             System.out.println(e.getMessage());
             System.out.println(HelpUtil.howToGetHelpStr);
@@ -142,7 +143,6 @@ public class SubtitleUtil {
          * linhas contém timestamps válidos. */
         objetosLegenda1 = criaArraySubtitles(arquivoOriginal, posIndicesLegendas);
 
-        // TODO: Finalizar.
         return objetosLegenda1;
     }
 

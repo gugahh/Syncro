@@ -12,18 +12,36 @@ public class Subtitle {
 	private int endTime;
 	private final StringBuilder textSb;
 
+    // Indica a linha que contem esta legenda no arquivo .srt orginal (a linha do indice).
+    private int linhaArquivoOriginal;
+
+    // Armazena o texto contido na linha que seria o indice original da legenda.
+    // Nao eh usado nos metodos de sincronizacao, apenas para validacao.
+    // Para sincronizacao, utilizamos o id.
+    private String textoLinhaIndice;
+
 	public Subtitle(int id, String startTime, String endTime) {
 		SubtitleUtil subtitleUtil = SubtitleUtil.getInstance();
 
-		this.textSb = new StringBuilder("");
+		this.textSb = new StringBuilder();
 		this.id = id;
 		this.startTime	= subtitleUtil.convertSubtitleTimeStampStringToInt(startTime);
 		this.endTime	= subtitleUtil.convertSubtitleTimeStampStringToInt(endTime);
 	}
 
+    public Subtitle(int id, int startTime, int endTime, int linhaArquivoOriginal, String textoLinhaIndice) {
+        SubtitleUtil subtitleUtil = SubtitleUtil.getInstance();
+
+        this.textSb = new StringBuilder();
+        this.id = id;
+        this.startTime	= startTime;
+        this.endTime	= endTime;
+        this.linhaArquivoOriginal = linhaArquivoOriginal;
+        this.textoLinhaIndice = textoLinhaIndice;
+    }
 
 	public Subtitle() {
-		textSb = new StringBuilder("");
+		textSb = new StringBuilder();
 	}
 
 	public int getEndTime() {
@@ -77,7 +95,23 @@ public class Subtitle {
 		this.textSb.append(textSb);
 	}
 
-	public void appendTexto(String texto) {
+    public int getLinhaArquivoOriginal() {
+        return linhaArquivoOriginal;
+    }
+
+    public void setLinhaArquivoOriginal(int linhaArquivoOriginal) {
+        this.linhaArquivoOriginal = linhaArquivoOriginal;
+    }
+
+    public String getTextoLinhaIndice() {
+        return textoLinhaIndice;
+    }
+
+    public void setTextoLinhaIndice(String textoLinhaIndice) {
+        this.textoLinhaIndice = textoLinhaIndice;
+    }
+
+    public void appendTexto(String texto) {
 		this.textSb.append(texto);
 	}
 

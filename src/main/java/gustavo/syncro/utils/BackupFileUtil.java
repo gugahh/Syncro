@@ -13,21 +13,19 @@ import java.time.format.DateTimeFormatter;
 
 public class BackupFileUtil {
 
-    private final String STR_NOT_NULL = "O nome do arquivo de legenda nao pode ser nulo";
-
     /**
      * Cria uma copia de um arquivo de legenda, adicionando o timestamp
      * atual ao nome do arquivo original.
      *
      * @param nomeArquivoOrigem
      * @return o nome do arquivo de copia criado.
-     * @throws FileBackupException
+     * @throws FileBackupException no caso de qualquer erro.
      */
     public String makeBackupFromFile(String nomeArquivoOrigem)
         throws FileBackupException {
 
         if (nomeArquivoOrigem == null) {
-            throw new FileBackupException(STR_NOT_NULL);
+            throw new FileBackupException("O nome do arquivo de legenda nao pode ser nulo");
         }
 
         Path sourcePath = Paths.get(nomeArquivoOrigem);
@@ -38,7 +36,7 @@ public class BackupFileUtil {
         }
 
         // Vamos gerar um nome novo, baseado no timestamp atual, para o backup.
-        String nomeNovoArquivo =nomeArquivoOrigem.substring(0, posicaoExtensao) +
+        String nomeNovoArquivo = "Backup_" + nomeArquivoOrigem.substring(0, posicaoExtensao) +
                 geraComplementoTimeStamp() + ".srt";
 
         Path targetPath = Paths.get(nomeNovoArquivo);
@@ -69,9 +67,8 @@ public class BackupFileUtil {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
 
         LocalDateTime now = LocalDateTime.now();
-        String formattedDate = now.format(formatter);
 
-        return formattedDate;
+        return now.format(formatter);
     }
 
 }

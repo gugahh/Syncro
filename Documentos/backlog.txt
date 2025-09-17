@@ -18,7 +18,7 @@ Backlog do Projeto Syncro
     - Uma classe principal escolhe entre um modo ou outro, e repassa os parametros. (OK em 11/09/25)
     - As rotinas de cado modo incluem validação de seus parâmetros. (OK em 11/09/25)
 
-5. Criar o modo "copyCat":
+5. Criar o modo "copyCat": (OK em 13/09/2025)
     - param: legenda de exemplo
     - param: posição inicial da legenda de exemplo (ex: Legenda 15)
     - param: posição final da legenda de exemplo (ex: Legenda 90)
@@ -28,10 +28,10 @@ Backlog do Projeto Syncro
         (ex: especificar "exemplo" de legenda de 15 a 30;
         "destino" também começando em 15, mas não existe a legenda 30 em destino).
 
-6. Forçar conversão de ANSI para UTF-8. Caso já seja UTF-8, não fazer nada.
+6. Forçar conversão de ANSI para UTF-8. Caso já seja UTF-8, não fazer nada (despriorizado).
     (se possível, fazer a conversão automaticamente).
 
-7. Criar o modo proporcional "proportional" (caso o CopyCat não resolva):
+7. Criar o modo proporcional "proportional" (caso o CopyCat não resolva) (despriorizado).
     - Informar legenda de início (obrigatória. Ex: 15)
     - Informar legenda de término (obrigatória; Ex: 39)
     - Informar a hora real da legenda de término (ex: 01:20:39s)
@@ -43,6 +43,28 @@ Backlog do Projeto Syncro
    a traducao dos pedacoes utilizando uma IA gratuita.
    Ex: monk.srt  ---> ( monk_001.srt, monk_002.srt, monk_003.srt )
 
-8. Criar o modo "merge", para reunir diversas legendas em uma, util
+9. Criar o modo "concat", para reunir diversas legendas em uma, util  (OK em 15/09/2025)
    para o caso de traducao via IA.
    Ex: ( monk_001.srt, monk_002.srt, monk_003.srt ) --> monk.srt
+
+10. Criar o modo "validate", pra analisar se legendas criadas por outros estão corretas.
+    - Copia para a memória todas as legendas (como no resto das actions).
+    - Copia os índices das legendas também para os objetos Subtitle, como texto (isso hoje não acontece).
+      (este dado vai ficar dentro do Subtitle).
+    - Cria uma lista correlacionando cada subtitle com a sua linha correspondente no arquivo original
+      (isso também não é feito, hoje - dado também vai ficar dentro do Subtitle).
+    - Loga quais índices / números de linha possuem linhas demais de texto (ex: 4 linhas) (Warning)
+    - Loga quais números de linha possuem a palavra "truncate" (Warning)
+    - Loga quais legendas possuem seus índices originais na máscara [xx - xx] (caso de Erro).
+    - Avisa de possíveis saltos na numeração original (Warning).
+    - Avisa sobre repetição de linhas 3 vezes ou mais (Warning).
+    - Avisa sobre caracteres estranhos, como { (Warning. Normalmente, é erro).
+
+11. Melhoria em SubtitleUtil (PRIORITARIA)
+    - Trocar:
+        Subtitle(int id, String startTime, String endTime) por
+        Subtitle(int id, int startTime, int endTime) ou similar.
+      A responsabilidade por converter timestamps de legendas não deveria estar em Subtitle.
+      Isso dificulta o controle de erros, visto que Subtitle não sabe a linha da legenda que está sendo
+      processada.
+      Subtitle é um VO e não deve lançar excessões.
