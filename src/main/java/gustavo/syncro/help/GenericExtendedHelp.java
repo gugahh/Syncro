@@ -3,11 +3,11 @@ package gustavo.syncro.help;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class GenericHelp extends AbstractHelp {
+public final class GenericExtendedHelp extends AbstractHelp {
 
     private final List<String> listaTxt = new ArrayList<>();
 
-    public GenericHelp (){
+    public GenericExtendedHelp(){
         addLinha("**************************************************************");
         addLinha("**  Syncro App. Um aplicativo para ajuste de legendas .SRT  **");
         addLinha("**   (c) 2007, 2025 Gustavo Santos (gugahh.br@gmail.com)    **");

@@ -1,12 +1,20 @@
 package gustavo.syncro;
 
+import gustavo.syncro.help.AbstractHelp;
 import gustavo.syncro.help.BasicHelp;
+import gustavo.syncro.help.GenericExtendedHelp;
+import gustavo.syncro.help.TimeAdjustHelp;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 public class SyncroHelp {
+
+    private static final List<AbstractHelp> allHelpers = Arrays.asList(
+            new GenericExtendedHelp(),
+            new TimeAdjustHelp()
+    );
 
 	private static final StringBuilder[] extendedHelp =
         {
@@ -120,7 +128,7 @@ public class SyncroHelp {
         try {
             for (String umaLinha : linhasHelp) {
                 System.out.println(umaLinha);
-                Thread.sleep(15); // Espera 15ms
+                Thread.sleep(10); // Espera 10ms
             }
         } catch (InterruptedException e) {
             throw new RuntimeException("Excessao inesperada em Thread.sleep.", e);
@@ -129,8 +137,52 @@ public class SyncroHelp {
 	}
 
 	public static void printExtendedHelp()  {
-        clearConsole();
-		InputStreamReader inp = new InputStreamReader(System.in);
+
+        final int qtLinhasPorTela = 20; //TODO: deveria analisar o console primeiro.
+
+        try {
+            Scanner scanner = new Scanner(System.in);
+            int contaHelpers = 0;
+
+            for (AbstractHelp umHelper : allHelpers) {
+                List<String> linhasTxtList = umHelper.getLinhasHelp();
+                contaHelpers++;
+
+                clearConsole(); // A cada bloco (helper), vamos limpar a tela.
+                int countLinhasTxt = 0; // A cada helper, zera a contagem de linhas, pois limpamos a tela.
+
+                for (String umaLinhaTxt : linhasTxtList) {
+                    System.out.println(umaLinhaTxt);
+                    Thread.sleep(8); // Espera 8ms a cada linha, pra efeito visual.
+
+                    countLinhasTxt++;
+                    if ((countLinhasTxt % qtLinhasPorTela == 0) // Atingiu o limite de linhas
+                            || (countLinhasTxt == linhasTxtList.size() && // Chegou ao fim do helper atual
+                            contaHelpers < allHelpers.size()    // E nao eh o ultimo helper.
+                    )
+                    ) {
+
+                        //Atingiu o momento em que pedimos pro usuario apertar Enter pra continuar!
+                        System.out.println("\n-- Digite ENTER para continuar, ou X para sair. --");
+                        String opcao = scanner.nextLine();
+                        if ("X".equalsIgnoreCase(opcao) ||
+                                "EXIT".equalsIgnoreCase(opcao) ||
+                                "QUIT".equalsIgnoreCase(opcao) ||
+                                "Q".equalsIgnoreCase(opcao)) {
+                            System.exit(0); // Usuario solicitou a saida.
+                        }
+                        clearConsole(); // Cada vez que aperta ENTER, limpamos a tela pra comecar do inicio da tela.
+                    }
+                } // Loop linhas de um helper.
+            }
+            scanner.close(); // Fechando o scanner pra liberar recursos.
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Excessao inesperada em Thread.sleep.", e);
+        }
+	}
+
+        /*
+        // Versao velha. Espero poder remover.
         try {
             int contador = 0;
             for (StringBuilder sb : extendedHelp) {
@@ -143,11 +195,7 @@ public class SyncroHelp {
                 }
                 contador++;
             }
-        } catch (IOException ioex){
-            System.out.print("Excessao inesperada. Codigo -20002");
-            System.exit(-1);
-        }
-	}
+         */
 
     /**
      * Limpa o console. Utiliza instrucoes especificas para cada S.O.
