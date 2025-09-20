@@ -25,10 +25,6 @@ public class SyncroApp {
         // Setando o console output para UTF-8
         System.setProperty("file.encoding", "UTF-8");
 
-        // Verificando se deu certo
-        // TODO: Remover
-        System.out.println("Default Charset: " + Charset.defaultCharset());
-
 		if(args.length == 0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
 			SyncroHelp.printBasicHelp();
