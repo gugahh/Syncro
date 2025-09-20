@@ -72,11 +72,11 @@ Backlog do Projeto Syncro
     - Cada modo deve possuir seu proprio arquivo de help (em progresso)
     - Criar help para os modos novos
     - Melhorar a exibicao do help de forma paginada. Sugestoes:
-        - Exibir as linhas mais lentamente, usando Thread.wait();
+        - Exibir as linhas mais lentamente, usando Thread.wait();   (OK em 20/09/2025).
         - Exibir "aperte qualquer tecla para prosseguir ou X para sair da ajuda."
         - A cada tela, limpar a tela e exibir de novo (rapidamente) todos os trechos
           do help já exibidos, para fazer com que o texto não tenha
           o "aperte qualquer tecla" no meio dele.
         - Descobrir de antemão quantas linhas tem o terminal atual.
-        - Descobrir como fazer o terminal exibir mensagens usando UTF-8
-        - Acentuar os arquivos de help (depende do UTF-8).
+        - Descobrir como fazer o terminal exibir mensagens usando UTF-8 (OK em 20/09/2025).
+        - Acentuar os arquivos de help (depende do UTF-8). (em progresso).

@@ -1,11 +1,13 @@
 package gustavo.syncro;
 
+import gustavo.syncro.help.BasicHelp;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public class SyncroHelp {
 
-	private static final StringBuilder basicHelp = new StringBuilder();
 	private static final StringBuilder[] extendedHelp =
         {
             new StringBuilder(),    // extendedHelp[0]
@@ -17,35 +19,7 @@ public class SyncroHelp {
 
 	static {
 
-		//Definido Help Básico.
-		basicHelp.append("------------------------------------------------------------\n");
-		basicHelp.append("|  Syncro - um aplicativo para sincronizacao de Legendas   |\n");
-		basicHelp.append("|      (c) 2007, 2025 Gustavo Santos (gugahh.br@gmail.com) |\n");
-		basicHelp.append("------------------------------------------------------------\n");
-		basicHelp.append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
-		basicHelp.append("  arquivo de legendas *.srt.\n");
-		basicHelp.append("- Este software e Freeware. Se gostar, mande-me um\n");
-		basicHelp.append("  e-mail agradecendo (use a opcao -help para detalhes).\n");
-		basicHelp.append("\n");
-		basicHelp.append("Utilizacao:\n");
-		basicHelp.append("-----------\n");
-		basicHelp.append("\n");
-		basicHelp.append("java -jar syncro.jar [-help]\n");
-		basicHelp.append("java -jar syncro.jar [-adjust [arquivo] [tempo] [indiceLegenda] ] [-nobak]\n");
-        basicHelp.append("java -jar syncro.jar [-renum [arquivo] [indiceorig] [indicenovo] ] [-nobak]\n");
-
-		basicHelp.append("\n");
-		basicHelp.append("  [-help]:   exibe um help mais completo que este.\n");
-		basicHelp.append("\n");
-		basicHelp.append("  [-adjust]  Utilizado para ajustar tempo de legenda.\n");
-		basicHelp.append("             Parametros arquivo, indiceLegenda e tempo sao obrigatorios.\n");
-		basicHelp.append("\n");
-        basicHelp.append("  [-renum]   Utilizado para renumerar as legendas.\n");
-        basicHelp.append("             Parametros arquivo, indice da legenda original e \n");
-        basicHelp.append("             indice da legenda novo (desejado) sao obrigatorios \n");
-        basicHelp.append("\n");
-		basicHelp.append("  [-nobak]: Opcional. Usar quando nao desejar criar um arquivo de backup.\n");
-
+        // Help Estendido.
 		//Tela 1:
 		extendedHelp[0].append("\n");
 		extendedHelp[0].append("------------------------------------------------------------\n");
@@ -55,8 +29,8 @@ public class SyncroHelp {
 
 		extendedHelp[0].append("- Utilize-o para adiantar ou atrasar as legendas de um\n");
 		extendedHelp[0].append("  arquivo de legendas *.srt.\n");
-		extendedHelp[0].append("- Este software e Freeware. Se gostar, mande-me um\n");
-		extendedHelp[0].append("  e-mail agradecendo (use a opcao -help para detalhes).\n");
+		extendedHelp[0].append("- Este software e Freeware. Se gostar, sinta-se à vontade\n");
+		extendedHelp[0].append("  para enviar e-mail agradecendo.\n");
 		extendedHelp[0].append("\n");
 		extendedHelp[0].append("Utilizacao:\n");
 		extendedHelp[0].append("-----------\n");
@@ -141,10 +115,21 @@ public class SyncroHelp {
 	}
 
 	public static void printBasicHelp() {
-		System.out.println(basicHelp);
+        clearConsole();
+        List<String> linhasHelp = new BasicHelp().getLinhasHelp();
+        try {
+            for (String umaLinha : linhasHelp) {
+                System.out.println(umaLinha);
+                Thread.sleep(15); // Espera 15ms
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Excessao inesperada em Thread.sleep.", e);
+        }
+        System.exit(0);
 	}
 
 	public static void printExtendedHelp()  {
+        clearConsole();
 		InputStreamReader inp = new InputStreamReader(System.in);
         try {
             int contador = 0;
@@ -164,7 +149,9 @@ public class SyncroHelp {
         }
 	}
 
-    /*
+    /**
+     * Limpa o console. Utiliza instrucoes especificas para cada S.O.
+     */
     public static void clearConsole() {
         try {
             final String os = System.getProperty("os.name");
@@ -178,5 +165,5 @@ public class SyncroHelp {
             System.exit(-1);
         }
     }
-     */
+
 }

@@ -3,6 +3,8 @@ package gustavo.syncro;
 import gustavo.syncro.actions.*;
 import gustavo.syncro.utils.*;
 
+import java.nio.charset.Charset;
+
 public class SyncroApp {
 
 	private static final TimeAdjustAction timeAdjustAction = TimeAdjustAction.getInstance();
@@ -19,7 +21,13 @@ public class SyncroApp {
 	public SyncroApp(){
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args)  {
+        // Setando o console output para UTF-8
+        System.setProperty("file.encoding", "UTF-8");
+
+        // Verificando se deu certo
+        // TODO: Remover
+        System.out.println("Default Charset: " + Charset.defaultCharset());
 
 		if(args.length == 0){
 			//Usuário não passou nenhum parâmetro. Exibir help básico:
