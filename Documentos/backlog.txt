@@ -8,13 +8,12 @@ Backlog do Projeto Syncro
 
 2. Permitir que o formato em segundos tenha valores fracionários (ex: +3,5s). (OK em 11/09/25)
 
-2.1 Criar testes unitarios para a classe SubtitleUtil
+2.1 Criar testes unitarios para a classe SubtitleUtil (despriorizado).
 
 3. Criar validadores (classes específicas) para os formatos de ajuste (+00:00:01s / +01s). (OK em 11/09/25)
 
 4. Refatorar o codigo para facilitar "instalar" novos modos (OK em 11/09/25)
     - cada modo deve ter seu proprio arquivo independente de rotinas. (OK em 11/09/25)
-    - cada modo deve possuir seu proprio arquivo de help (adiado)
     - Uma classe principal escolhe entre um modo ou outro, e repassa os parametros. (OK em 11/09/25)
     - As rotinas de cado modo incluem validação de seus parâmetros. (OK em 11/09/25)
 
@@ -68,3 +67,16 @@ Backlog do Projeto Syncro
       Isso dificulta o controle de erros, visto que Subtitle não sabe a linha da legenda que está sendo
       processada.
       Subtitle é um VO e não deve lançar excessões.
+
+12.  Melhorias no Help  (iniciado em 19/09/2025)
+    - Cada modo deve possuir seu proprio arquivo de help (em progresso)
+    - Criar help para os modos novos
+    - Melhorar a exibicao do help de forma paginada. Sugestoes:
+        - Exibir as linhas mais lentamente, usando Thread.wait();
+        - Exibir "aperte qualquer tecla para prosseguir ou X para sair da ajuda."
+        - A cada tela, limpar a tela e exibir de novo (rapidamente) todos os trechos
+          do help já exibidos, para fazer com que o texto não tenha
+          o "aperte qualquer tecla" no meio dele.
+        - Descobrir de antemão quantas linhas tem o terminal atual.
+        - Descobrir como fazer o terminal exibir mensagens usando UTF-8
+        - Acentuar os arquivos de help (depende do UTF-8).

@@ -106,7 +106,7 @@ public class SubtitleUtil {
     public List<Subtitle> obtemListaLegendasFromFile(String fileName)
             throws ValidacaoException, RuntimeException {
 
-        List<String> arquivoOriginal = null;
+        List<String> linhasTxtList = null;
 
         // Lista com cada uma das linhas do arquivo original, como texto.
         // Guarda as posicoes das Legendas (nos de linha) no texto original.
@@ -117,11 +117,9 @@ public class SubtitleUtil {
 
         /* 1ª iteração: carregando ArrayList com todas as linhas da legenda.
          * Este método também cria uma cópia backup do arquivo de legenda. */
-
-
         try {
             FileReaderUtil fileReaderUtil = new FileReaderUtil();
-            arquivoOriginal = fileReaderUtil.readFromFile(fileName);
+            linhasTxtList = fileReaderUtil.readFromFile(fileName, false);
         } catch (FileReadException e) {
             System.out.println(e.getMessage());
             System.out.println(HelpUtil.howToGetHelpStr);
@@ -135,13 +133,13 @@ public class SubtitleUtil {
          * Um índice deve vir SEMPRE imediatamente seguido de uma linha de timestamps, e
          * deve ser logicamente numérico. Satisfeitas estas condições, armazena-se a posição
          * (Nº de linha) que contém o índice). */
-        posIndicesLegendas =  localizaIndicesLegendas(arquivoOriginal);
+        posIndicesLegendas =  localizaIndicesLegendas(linhasTxtList);
 
         /* 3ª iteração:
          * Cria um array de objetos Subtitle;
          * Já testamos e sabemos quais linhas contém um índice, e quais
          * linhas contém timestamps válidos. */
-        objetosLegenda1 = criaArraySubtitles(arquivoOriginal, posIndicesLegendas);
+        objetosLegenda1 = criaArraySubtitles(linhasTxtList, posIndicesLegendas);
 
         return objetosLegenda1;
     }
@@ -151,19 +149,19 @@ public class SubtitleUtil {
      * Um índice deve vir SEMPRE imediatamente seguido de uma linha de timestamps, e
      * deve ser logicamente numérico. Satisfeitas estas condições, armazena-se a posição
      * (Nº de linha) que contém o índice). */
-    private List<Integer> localizaIndicesLegendas(List<String> arquivoOriginal){
+    private List<Integer> localizaIndicesLegendas(List<String> linhasTxtList){
         // System.out.println(">> Entrou em localizaIndicesLegendas");
 
         List<Integer> posIndicesLegendas = new ArrayList<>();
 
-        // if(arquivoOriginal.size() < 2) return; //nada a fazer
+        // if(linhasTxtList.size() < 2) return; //nada a fazer
 
         String linhaAtual;
-        for(int idx=1; idx < arquivoOriginal.size(); idx++){
+        for(int idx=1; idx < linhasTxtList.size(); idx++){
 
             /* Procurando linhas com timestamps:
              * Estas deverão ter o formato "00:00:01,520 --> 00:00:03,541" */
-            linhaAtual = arquivoOriginal.get(idx);
+            linhaAtual = linhasTxtList.get(idx);
 
             if(linhaAtual.trim().isEmpty()) continue; // Linha em branco, ignorar.
 
@@ -171,11 +169,11 @@ public class SubtitleUtil {
                 //Linha atual é uma linha de timestamps.
                 //Linha anterior, então, DEVERIA ser uma linha de índices.
                 try {
-                    Integer.parseInt( arquivoOriginal.get(idx-1) );
+                    Integer.parseInt( linhasTxtList.get(idx-1) );
                     // Se uma excessão NÃO foi lançada, bloco id + tempo é correto.
                     //Adicionar a linha de índice ao array de posições.
                     posIndicesLegendas.add(idx - 1);
-                    //System.out.println("Achou: " + arquivoOriginal.get(idx-1));
+                    //System.out.println("Achou: " + linhasTxtList.get(idx-1));
                 } catch( NumberFormatException e){
                     e.printStackTrace();
                 }
@@ -194,14 +192,11 @@ public class SubtitleUtil {
 
         List<Subtitle> objetosLegenda1 = new ArrayList<Subtitle>();
 
-        // System.out.println(">> Entrou em criaArraySubtitles");
-
-        // System.out.println("posIndicesLegendas.size(): " + posIndicesLegendas.size());
-
         for(int idx=0; idx < posIndicesLegendas.size(); idx++) {
 
             // System.out.println("Processando idx :" + String.valueOf(idx));
 
+            //Pulando as linhas em branco
             int indiceLegenda	= Integer.parseInt(arquivoOriginal.get( posIndicesLegendas.get(idx) ));
             String startTime	= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(0, 12);
             String endTime		= arquivoOriginal.get( posIndicesLegendas.get(idx)+1).substring(17, 29);
@@ -218,17 +213,19 @@ public class SubtitleUtil {
             else posicaoFinal = arquivoOriginal.size();
 
             //Adicionando todas as linhas (texto das legendas) entre uma legenda e outra.
+            //Exceto linhas em branco, que devem ser ignoradas.
             String tempString;
             for(int g=posIndicesLegendas.get(idx)+2; g < posicaoFinal; g++) {
                 tempString = arquivoOriginal.get( g );
+
+                if(tempString.trim().isEmpty()) continue; // Linha em branco, ignorar.
+
                 if(g>posIndicesLegendas.get(idx)+2){
                     sub.appendTexto("\r\n"); //linhas posteriores à primeira merecem um Newline antes...
                 }
                 sub.appendTexto( tempString );
             }
         }
-        // printAllSubtitleObjects(); // Usado para Debugar.
-        // System.out.println("<< Saiu de criaArraySubtitles");
 
         return objetosLegenda1;
     }

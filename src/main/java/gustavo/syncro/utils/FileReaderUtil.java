@@ -53,9 +53,11 @@ public class FileReaderUtil {
 
                 //Carregando ArrayList
                 currentLine = currentLine.trim();
-                if (removeLinhasEmBranco && !currentLine.isEmpty()) { //Evitando linhas em branco, se solicitado.
-                    stringList.add(currentLine);
+                if (removeLinhasEmBranco && currentLine.isEmpty()) {
+                    //Ignorando linhas em branco, se solicitado.
+                    continue;
                 }
+                stringList.add(currentLine);
             }
         } catch(NullPointerException | IOException ex) {
             throw new FileReadException(String.format(ERRO_LEITURA_LEGENDA, stringList), ex);
