@@ -32,14 +32,17 @@ public class CopyCatAction extends AbstractAction {
 
     @Override
     public void doAction(String[] args) {
-        // Parametros: [nomeArquOrigem] [idxInicioOrig] [idxFinalOrig] [nomeArqDest] [idxInicioDest] [-nobak]
-        //              [1]             [2]             [3]            [4]           [5]             [6]
+        // Parametros: [nomeArquOrigem] [idxInicioOrig] [idxFinalOrig] [nomeArqDest] [idxInicioDest] ...
+        //              [1]             [2]             [3]            [4]           [5]
+
+        // [-nobak ou force] [-nobak ou force]
+        // [6]               [7]
 
         System.out.println("\nSyncro App - executando CopyCatAction\n");
 
         SubtitleUtil sbtUtil = SubtitleUtil.getInstance();
 
-        if(args.length < 6 || args.length > 7){ //Num de params diferente do esperado.
+        if(args.length < 6 || args.length > 8){ //Num de params diferente do esperado.
             System.out.println("\tERRO: Numero de parametros incorreto");
             System.out.println("\tpara realizar esta operacao.");
             System.out.println(HelpUtil.howToGetHelpStr);
@@ -47,16 +50,44 @@ public class CopyCatAction extends AbstractAction {
         }
 
         boolean fazerBackupLegenda = true;
+        boolean ignorarArDeOrigemMenor = false;    // Force ignora a difereca entre qt de legendas entre os arquivos.
 
-        if (args.length == 7) {
-            //Como existe um Args[6], este só pode ser -nobak.
-            if (args[6].equalsIgnoreCase("-nobak") || args[6].equalsIgnoreCase("-noback")) { //Usu solicitou não fazer backup
-                fazerBackupLegenda = false;
-            } else {
-                //Parâmetro inválido. Unica opção é -nobak.
+        if (args.length == 7 || args.length == 8) {
+
+            // TODO: criar equals aceitando lista de parametros.
+
+            //Como existe um Args[6], args[6] só pode ser -nobak ou -force
+            if (!args[6].equalsIgnoreCase("-nobak")
+                && !args[6].equalsIgnoreCase("-noback")
+                    && !args[6].equalsIgnoreCase("-force")) {
+                //Parâmetro inválido.
                 System.out.println("\tparametro incorreto");
                 System.out.println(HelpUtil.howToGetHelpStr);
                 System.exit(-1);
+            }
+
+            //Caso exista um args[7], ele só pode ser -nobak ou -force
+            if (args.length == 8 && !args[7].equalsIgnoreCase("-nobak")
+                    && !args[7].equalsIgnoreCase("-noback")
+                    && !args[7].equalsIgnoreCase("-force")) {
+                //Parâmetro inválido.
+                System.out.println("\tparametro incorreto");
+                System.out.println(HelpUtil.howToGetHelpStr);
+                System.exit(-1);
+            }
+
+            // Nobak pode ser o parametro indice 6 ou 7.
+            if (args[6].equalsIgnoreCase("-nobak")
+                    || args[6].equalsIgnoreCase("-noback")
+                    || (args.length == 8 && (args[7].equalsIgnoreCase("-nobak") || args[7].equalsIgnoreCase("-noback")))
+            ) { //Usu solicitou não fazer backup
+                fazerBackupLegenda = false;
+            }
+
+            // Force pode ser o parametros indice 6 ou 7.
+            if (args[6].equalsIgnoreCase("-force")
+                    || (args.length == 8 && args[7].equalsIgnoreCase("-force"))) { //Usu solicitou não fazer backup
+                ignorarArDeOrigemMenor = true;
             }
         }
 
@@ -127,7 +158,7 @@ public class CopyCatAction extends AbstractAction {
                 listaLegendasOrigem.size(), listaLegendasDest.size());
 
         // Realizando validacoes sobre os arquivos fornecidos.
-        validaArquivos(idxInicArqOrig, idxFimArqOrig, idxInicArqDest, listaLegendasOrigem, listaLegendasDest);
+        validaArquivos(idxInicArqOrig, idxFimArqOrig, idxInicArqDest, listaLegendasOrigem, listaLegendasDest, ignorarArDeOrigemMenor);
 
         // Fazendo a copia dos timestamps, ja considerando os indices desejados
         int idxOrigem = idxInicArqOrig - 1;
@@ -197,7 +228,8 @@ public class CopyCatAction extends AbstractAction {
                         int idxFimArqOrig,
                         int idxInicArqDest,
                         List<Subtitle> listaLegendasOrigem,
-                        List<Subtitle> listaLegendasDest
+                        List<Subtitle> listaLegendasDest,
+                        boolean ignorarArqOrigemMenor
                         ) {
         boolean existeErro = false;
         String msgErro = "";
@@ -285,7 +317,7 @@ public class CopyCatAction extends AbstractAction {
                     "\t  isso eh permitido, mas esteja informado que existe essa diferenca de tamanho.");
         }
 
-        if ((qtLegendasOrigem - qtLegendasDest) < 0) {
+        if (!ignorarArqOrigemMenor && (qtLegendasOrigem - qtLegendasDest) < 0) {
             System.out.println("\n\t- Atencao: O arquivo de origem tem MENOS legendas,\n" +
                     "\t  no intervalo especificado, que o arquivo de destino;\n" +
                     "\t  isso NAO eh permitido, uma vez que ficariam legendas, no final do arquivo\n" +
